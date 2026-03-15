@@ -1,11 +1,60 @@
 from __future__ import annotations
 
+import asyncio
+import time
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple
 
 import config
 from constants import IST
-# from models import AutoPurge, BlockList, EasyTag, Guild, Scrim, SSVerify, TagCheck, Tourney
+
+
+class QueryCache:
+    """Ultra-fast in-memory TTL cache for DB query results.
+    
+    Stores results with timestamps. Expired entries are lazily cleaned.
+    All lookups are O(1) dict access — sub-millisecond.
+    """
+
+    def __init__(self, default_ttl: float = 30.0):
+        self._store: Dict[str, Tuple[Any, float]] = {}  # key -> (value, expire_time)
+        self._default_ttl = default_ttl
+
+    def get(self, key: str) -> Optional[Any]:
+        """Get a cached value. Returns None if missing or expired."""
+        entry = self._store.get(key)
+        if entry is None:
+            return None
+        value, expire_time = entry
+        if time.monotonic() > expire_time:
+            del self._store[key]
+            return None
+        return value
+
+    def set(self, key: str, value: Any, ttl: Optional[float] = None):
+        """Cache a value with optional custom TTL."""
+        self._store[key] = (value, time.monotonic() + (ttl or self._default_ttl))
+
+    def delete(self, key: str):
+        """Remove a specific key."""
+        self._store.pop(key, None)
+
+    def invalidate_prefix(self, prefix: str):
+        """Remove all keys starting with a prefix (e.g., 'guild:123')."""
+        to_delete = [k for k in self._store if k.startswith(prefix)]
+        for k in to_delete:
+            del self._store[k]
+
+    def clear(self):
+        """Clear all cached entries."""
+        self._store.clear()
+
+    def cleanup(self):
+        """Remove all expired entries (call periodically)."""
+        now = time.monotonic()
+        expired = [k for k, (_, exp) in self._store.items() if now > exp]
+        for k in expired:
+            del self._store[k]
 
 
 class CacheManager:
@@ -25,8 +74,15 @@ class CacheManager:
         self.ssverify_channels = set()
 
         self.blocked_ids = set()
-        self.blocked_ids = set()
         self.noprefix = {}
+
+        # Fast lookup caches
+        self.premium_guilds: set = set()  # Guild IDs with active premium
+        self.scrim_counts: Dict[int, int] = {}  # guild_id -> scrim count
+        self.tourney_counts: Dict[int, int] = {}  # guild_id -> tourney count
+
+        # Generic TTL query cache for arbitrary lookups
+        self.query_cache = QueryCache(default_ttl=30.0)
 
     async def fill_temp_cache(self):
         from models import AutoPurge, BlockList, EasyTag, Guild, Scrim, SSVerify, TagCheck, Tourney, NoPrefix
@@ -37,6 +93,8 @@ class CacheManager:
                 "color": record.embed_color or config.COLOR,
                 "footer": record.embed_footer or config.FOOTER,
             }
+            if record.is_premium:
+                self.premium_guilds.add(record.guild_id)
 
         async for record in EasyTag.all():
             self.eztagchannels.add(record.channel_id)
@@ -66,11 +124,36 @@ class CacheManager:
         async for record in NoPrefix.all():
             self.noprefix[record.user_id] = record.expires_at
 
+        # Pre-cache scrim and tourney counts per guild
+        from tortoise.functions import Count
+        scrim_counts = await Scrim.all().group_by("guild_id").annotate(cnt=Count("id")).values("guild_id", "cnt")
+        for row in scrim_counts:
+            self.scrim_counts[row["guild_id"]] = row["cnt"]
+
+        tourney_counts = await Tourney.all().group_by("guild_id").annotate(cnt=Count("id")).values("guild_id", "cnt")
+        for row in tourney_counts:
+            self.tourney_counts[row["guild_id"]] = row["cnt"]
+
+        print(f"Cache: {len(self.guild_data)} guilds, {len(self.premium_guilds)} premium, "
+              f"{len(self.scrim_counts)} scrim guilds, {len(self.tourney_counts)} tourney guilds")
+
     def guild_color(self, guild_id: int):
         return self.guild_data.get(guild_id, {}).get("color", config.COLOR)
 
     def guild_footer(self, guild_id: int):
         return self.guild_data.get(guild_id, {}).get("footer", config.FOOTER)
+
+    def is_premium(self, guild_id: int) -> bool:
+        """O(1) premium check from memory — no DB hit."""
+        return guild_id in self.premium_guilds
+
+    def get_scrim_count(self, guild_id: int) -> int:
+        """O(1) scrim count from memory."""
+        return self.scrim_counts.get(guild_id, 0)
+
+    def get_tourney_count(self, guild_id: int) -> int:
+        """O(1) tourney count from memory."""
+        return self.tourney_counts.get(guild_id, 0)
 
     async def update_guild_cache(self, guild_id: int, *, set_default=False) -> None:
         from models import Guild
@@ -87,7 +170,15 @@ class CacheManager:
             "footer": _g.embed_footer or config.FOOTER,
         }
 
-    # @staticmethod
-    # @cached(ttl=10, serializer=JsonSerializer())
-    # async def match_bot_guild(guild_id: int, bot_id: int) -> bool:
-    #     return await Guild.filter(pk=guild_id, bot_id=bot_id).exists()
+        # Update premium status
+        if _g.is_premium:
+            self.premium_guilds.add(guild_id)
+        else:
+            self.premium_guilds.discard(guild_id)
+
+    async def _periodic_cleanup(self):
+        """Background task to clean expired query cache entries."""
+        while True:
+            await asyncio.sleep(60)
+            self.query_cache.cleanup()
+

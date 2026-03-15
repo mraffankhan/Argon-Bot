@@ -35,3 +35,4 @@ pytz>=2023.3
 tortoise-orm>=0.19.3
 typing-extensions>=4.6.3
 ujson>=5.10.0
+pypika>=0.51.1

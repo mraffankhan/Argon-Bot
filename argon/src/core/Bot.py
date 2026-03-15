@@ -68,7 +68,6 @@ class AioMySQLPoolWrapper:
         async with self._pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute(query, args)
-                await conn.commit()
 
     async def fetch(self, query: str, *args):
         query = self._convert_query(query)
@@ -184,12 +183,7 @@ class Argon(commands.AutoShardedBot):
         """import and return config.py"""
         return __import__("config")
 
-    @property
-    def db(self):
-        """to execute raw queries"""
-        if not hasattr(self, "_db_pool_wrapped"):
-            self._db_pool_wrapped = AioMySQLPoolWrapper(Tortoise.get_connection("default")._pool)
-        return self._db_pool_wrapped
+
 
     @property
     def prime_link(self):
@@ -211,10 +205,12 @@ class Argon(commands.AutoShardedBot):
         self.cache = CacheManager(self)
         await self.cache.fill_temp_cache()
 
-        await self.cache.fill_temp_cache()
+        # Start periodic cache cleanup
+        asyncio.create_task(self.cache._periodic_cleanup())
 
         # Cache the connection pool for direct access
-        self._db_pool_wrapped = AioMySQLPoolWrapper(Tortoise.get_connection("default")._pool)
+        self._db_pool = Tortoise.get_connection("default")._pool
+        self._db_pool_wrapped = AioMySQLPoolWrapper(self._db_pool)
 
         # Initializing Models (Assigning Bot attribute to all models)
         for mname, model in Tortoise.apps.get("models").items():
@@ -225,14 +221,7 @@ class Argon(commands.AutoShardedBot):
         """to execute raw queries"""
         return self._db_pool_wrapped
 
-# ... (rest of the file) ...
 
-    @property
-    async def db_latency(self):
-        t1 = time.perf_counter()
-        await self.db.execute("SELECT 1;")
-        t2 = time.perf_counter() - t1
-        return f"{t2*1000:.2f} ms"
 
     async def setup_hook(self) -> None:
         await self.init_quo()
@@ -477,6 +466,10 @@ class Argon(commands.AutoShardedBot):
     @staticmethod
     @cached(ttl=60)
     async def is_premium_guild(guild_id: int) -> bool:
+        # Try cache first (O(1), no DB hit)
+        from core import bot as _bot_module
+        if hasattr(_bot_module, 'bot') and hasattr(_bot_module.bot, 'cache'):
+            return _bot_module.bot.cache.is_premium(guild_id)
         return await Guild.filter(pk=guild_id, is_premium=True).exists()
 
     @property
@@ -503,7 +496,9 @@ class Argon(commands.AutoShardedBot):
     @property
     async def db_latency(self):
         t1 = time.perf_counter()
-        await self.db.fetchval("SELECT 1;")
+        async with self._db_pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute("SELECT 1")
         t2 = time.perf_counter() - t1
         return f"{t2*1000:.2f} ms"
 
