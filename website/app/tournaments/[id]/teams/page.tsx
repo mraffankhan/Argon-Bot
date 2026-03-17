@@ -9,24 +9,22 @@ export default async function TournamentTeamsPage({ params }: { params: { id: st
     const { id } = await params;
 
     let tourney = null;
-    let teams = [];
+    let teams: any[] = [];
 
     try {
         // Fetch tournament details
-        const [tourneyRows]: any = await db.execute(
-            `SELECT * FROM \`tm.tourney\` WHERE id = ? LIMIT 1`,
-            [id]
-        );
+        const tourneyRows = await db<any[]>`
+            SELECT * FROM "tm.tourney" WHERE id = ${id} LIMIT 1
+        `;
         tourney = tourneyRows?.[0] || null;
 
         // Fetch registered teams using the join table
-        const [teamRows]: any = await db.execute(
-            `SELECT s.* FROM \`tm.tourney_tm.register\` j 
-             INNER JOIN \`tm.register\` s ON s.id = j.tmslot_id 
-             WHERE j.\`tm.tourney_id\` = ? 
-             ORDER BY s.num ASC`,
-            [id]
-        );
+        const teamRows = await db<any[]>`
+            SELECT s.* FROM "tm.tourney_tm.register" j 
+            INNER JOIN "tm.register" s ON s.id = j.tmslot_id 
+            WHERE j."tm.tourney_id" = ${id} 
+            ORDER BY s.num ASC
+        `;
         teams = teamRows || [];
     } catch (error) {
         console.error(`Failed to fetch teams for tournament ${id}:`, error);

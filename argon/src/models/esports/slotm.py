@@ -201,22 +201,22 @@ class ScrimsSlotManager(BaseDbModel):
 
     async def user_slots(self, user_id: int) -> List[Any]:
         query = """
-        (SELECT *
-		    FROM
-			(SELECT SCRIMS.ID AS SCRIM_ID,
-					*
-				FROM PUBLIC."sm.scrims" AS SCRIMS
-				FULL OUTER JOIN
-					(SELECT ID AS ASSIGNED_SLOT_ID,
-							*
-						FROM PUBLIC."sm.scrims_sm.assigned_slots" AS SCRIM_SLOT
-						INNER JOIN PUBLIC."sm.assigned_slots" AS SLOTS ON SLOTS.ID = SCRIM_SLOT.ASSIGNEDSLOT_ID) AS SCRIM_SLOT ON SCRIMS.ID = SCRIM_SLOT."sm.scrims_id"
-				WHERE (SCRIMS.ID = ANY ($1)
-											AND MATCH_TIME > NOW()
-											AND OPENED_AT IS NULL = TRUE
-											AND CLOSED_AT > CURRENT_DATE + interval '1 minute'
-											AND SCRIM_SLOT."sm.scrims_id" IS NOT NULL)) AS SM
-		WHERE USER_ID = $2)        
+        SELECT *
+            FROM
+            (SELECT SCRIMS.id AS scrim_id,
+                    *
+                FROM public."sm.scrims" AS SCRIMS
+                FULL OUTER JOIN
+                    (SELECT id AS assigned_slot_id,
+                            *
+                        FROM public."sm.scrims_sm.assigned_slots" AS SCRIM_SLOT
+                        INNER JOIN public."sm.assigned_slots" AS SLOTS ON SLOTS.id = SCRIM_SLOT.assignedslot_id) AS SCRIM_SLOT ON SCRIMS.id = SCRIM_SLOT."sm.scrims_id"
+                WHERE (SCRIMS.id = ANY ($1)
+                                            AND match_time > NOW()
+                                            AND opened_at IS NULL
+                                            AND closed_at > CURRENT_DATE + interval '1 minute'
+                                            AND SCRIM_SLOT."sm.scrims_id" IS NOT NULL)) AS SM
+        WHERE user_id = $2
         """
 
         return await self.bot.db.fetch(query, self.scrim_ids, user_id)

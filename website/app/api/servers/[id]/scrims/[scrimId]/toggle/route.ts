@@ -9,10 +9,9 @@ export async function POST(
         const { id: guildId, scrimId } = await params;
 
         // 1. Get the scrim
-        const [scrimRows] = await db.query<any[]>(
-            `SELECT * FROM \`sm.scrims\` WHERE id = ? AND guild_id = ?`,
-            [scrimId, guildId]
-        );
+        const scrimRows = await db<any[]>`
+            SELECT * FROM "sm.scrims" WHERE id = ${scrimId} AND guild_id = ${guildId}
+        `;
 
         if (scrimRows.length === 0) {
             return NextResponse.json({ error: 'Scrim not found' }, { status: 404 });
@@ -31,10 +30,9 @@ export async function POST(
             // CLOSE registration
             // 1. Update scrim in database
             try {
-                await db.query(
-                    `UPDATE \`sm.scrims\` SET closed_at = ?, opened_at = NULL WHERE id = ?`,
-                    [now, scrimId]
-                );
+                await db`
+                    UPDATE "sm.scrims" SET "closed_at" = ${now}, "opened_at" = NULL WHERE id = ${scrimId}
+                `;
             } catch (updateError) {
                 console.error('[Scrim Toggle] Update error:', updateError);
                 return NextResponse.json({ error: 'Failed to update scrim' }, { status: 500 });
@@ -93,26 +91,23 @@ export async function POST(
         } else {
             // OPEN registration
             // 1. Clear old slots
-            const [oldSlotJoins] = await db.query<any[]>(
-                `SELECT assignedslot_id FROM \`sm.scrims_sm.assigned_slots\` WHERE \`sm.scrims_id\` = ?`,
-                [scrimId]
-            );
+            const oldSlotJoins = await db<any[]>`
+                SELECT assignedslot_id FROM "sm.scrims_sm.assigned_slots" WHERE "sm.scrims_id" = ${scrimId}
+            `;
 
             if (oldSlotJoins && oldSlotJoins.length > 0) {
                 const oldSlotIds = oldSlotJoins.map((j: any) => j.assignedslot_id);
-                const placeholders = oldSlotIds.map(() => '?').join(',');
-                await db.query(`DELETE FROM \`sm.assigned_slots\` WHERE id IN (${placeholders})`, oldSlotIds);
-                await db.query(`DELETE FROM \`sm.scrims_sm.assigned_slots\` WHERE \`sm.scrims_id\` = ?`, [scrimId]);
+                await db`DELETE FROM "sm.assigned_slots" WHERE id IN ${db(oldSlotIds)}`;
+                await db`DELETE FROM "sm.scrims_sm.assigned_slots" WHERE "sm.scrims_id" = ${scrimId}`;
             }
 
             // 2. Update scrim: set opened_at, clear closed_at, reset available_slots
             const availableSlots = Array.from({ length: scrim.total_slots }, (_, i) => i + (scrim.start_from || 1));
             try {
-                // MySQL JSON serialization for available_slots
-                await db.query(
-                    `UPDATE \`sm.scrims\` SET opened_at = ?, closed_at = NULL, slotlist_message_id = NULL, available_slots = ? WHERE id = ?`,
-                    [now, JSON.stringify(availableSlots), scrimId]
-                );
+                // PostgreSQL handles arrays directly
+                await db`
+                    UPDATE "sm.scrims" SET opened_at = ${now}, closed_at = NULL, slotlist_message_id = NULL, available_slots = ${availableSlots} WHERE id = ${scrimId}
+                `;
             } catch (updateError) {
                 console.error('[Scrim Toggle] Update error:', updateError);
                 return NextResponse.json({ error: 'Failed to update scrim' }, { status: 500 });

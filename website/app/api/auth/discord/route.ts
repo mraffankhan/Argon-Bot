@@ -1,16 +1,23 @@
 import { NextResponse } from 'next/server';
 
-const DISCORD_CLIENT_ID = process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID || '1470031097357140063';
-const DISCORD_OAUTH_URL = 'https://discord.com/api/oauth2/authorize';
-const REDIRECT_URI = process.env.NODE_ENV === 'production'
+const DISCORD_CLIENT_ID = process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID || process.env.DISCORD_CLIENT_ID || '1470031097357140063';
+const DISCORD_OAUTH_URL = 'https://discord.com/oauth2/authorize';
+const REDIRECT_URI = (process.env.NODE_ENV === 'production'
     ? 'https://ravonixx.xyz/api/auth/callback'
-    : 'http://localhost:3000/api/auth/callback';
+    : 'http://localhost:3000/api/auth/callback').trim();
 
 export async function GET() {
-    const scope = encodeURIComponent('identify guilds email guilds.join');
-    const redirectUri = encodeURIComponent(REDIRECT_URI);
+    const clientId = DISCORD_CLIENT_ID.trim();
+    const scope = 'identify email guilds'; // Required scopes: identify, email, guilds
+    const redirectUri = REDIRECT_URI;
 
-    const authUrl = `${DISCORD_OAUTH_URL}?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
+    const authUrl = new URL(DISCORD_OAUTH_URL);
+    authUrl.searchParams.set('client_id', clientId);
+    authUrl.searchParams.set('redirect_uri', redirectUri);
+    authUrl.searchParams.set('response_type', 'code');
+    authUrl.searchParams.set('scope', scope);
+    // Added prompt=consent to ensure the user is always prompted (optional, but good for debugging)
+    // authUrl.searchParams.set('prompt', 'consent');
 
-    return NextResponse.redirect(authUrl);
+    return NextResponse.redirect(authUrl.toString());
 }

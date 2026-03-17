@@ -15,52 +15,45 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Invalid table name.' }, { status: 400 });
         }
 
-        let result: any, fields: any;
+        let result: any;
 
-        // 2. Handle CRUD Operations securely via `mysql2` module
+        // 2. Handle CRUD Operations via `postgres` module
         switch (action) {
             case 'read':
-                // Escape table name natively to avoid reserved word conflicts in MySQL
-                [result, fields] = await db.execute(`SELECT * FROM \`${table}\` LIMIT 100 OFFSET ?`, [payload?.offset || 0]);
+                // Using postgres.js tagged templates for safe queries
+                result = await db`SELECT * FROM ${db(table)} LIMIT 100 OFFSET ${payload?.offset || 0}`;
                 break;
 
             case 'read_columns':
-                [result, fields] = await db.execute(`
+                // In PostgreSQL, target schema is typically 'public'
+                result = await db`
                     SELECT column_name, data_type 
                     FROM information_schema.columns 
-                    WHERE table_schema = 's1336_Argon' AND table_name = ?
-                `, [table]);
+                    WHERE table_schema = 'public' AND table_name = ${table}
+                `;
                 break;
 
             case 'create':
-                const insertKeys = Object.keys(payload);
-                if (insertKeys.length === 0) throw new Error("No data provided");
-
-                const placeholders = insertKeys.map(() => '?').join(', ');
-                const cols = insertKeys.map(k => `\`${k}\``).join(', ');
-                const values = Object.values(payload);
-
-                [result, fields] = await db.execute(
-                    `INSERT INTO \`${table}\` (${cols}) VALUES (${placeholders})`,
-                    values as any[]
-                );
-
-                // MySQL doesn't natively support RETURNING *, so we just send success
+                if (!payload || Object.keys(payload).length === 0) throw new Error("No data provided");
+                
+                // postgres.js helper for multi-column inserts
+                result = await db`
+                    INSERT INTO ${db(table)} ${db(payload)}
+                    RETURNING *
+                `;
                 break;
 
             case 'update':
-                const updateKeys = Object.keys(payload.data);
-                if (updateKeys.length === 0 || !payload.idField || payload.idValue === undefined) {
+                if (!payload?.data || Object.keys(payload.data).length === 0 || !payload.idField || payload.idValue === undefined) {
                     throw new Error("Invalid update payload");
                 }
 
-                const setCols = updateKeys.map(k => `\`${k}\` = ?`).join(', ');
-                const updateValues = [...Object.values(payload.data), payload.idValue];
-
-                [result, fields] = await db.execute(
-                    `UPDATE \`${table}\` SET ${setCols} WHERE \`${payload.idField}\` = ?`,
-                    updateValues as any[]
-                );
+                // postgres.js helper for updates
+                result = await db`
+                    UPDATE ${db(table)} SET ${db(payload.data)}
+                    WHERE ${db(payload.idField)} = ${payload.idValue}
+                    RETURNING *
+                `;
                 break;
 
             case 'delete':
@@ -68,10 +61,11 @@ export async function POST(req: Request) {
                     throw new Error("Invalid delete payload");
                 }
 
-                [result, fields] = await db.execute(
-                    `DELETE FROM \`${table}\` WHERE \`${payload.idField}\` = ?`,
-                    [payload.idValue]
-                );
+                result = await db`
+                    DELETE FROM ${db(table)} 
+                    WHERE ${db(payload.idField)} = ${payload.idValue}
+                    RETURNING *
+                `;
                 break;
 
             default:

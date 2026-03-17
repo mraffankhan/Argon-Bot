@@ -13,7 +13,7 @@ class Lockdown(models.Model):
     type = fields.CharEnumField(constants.LockType, max_length=20)
     role_id = fields.BigIntField(null=True)
     channel_id = fields.BigIntField(null=True)
-    channel_ids = ArrayField(fields.BigIntField(), default=list, index=True)
+    channel_ids = ArrayField(fields.BigIntField(), default=list)
     expire_time = fields.DatetimeField(null=True)
     author_id = fields.BigIntField()
 

@@ -14,10 +14,9 @@ export async function POST(
         }
 
         // 1. Fetch the tournament
-        const [tourneyRows]: any = await db.execute(
-            `SELECT * FROM \`tm.tourney\` WHERE id = ? AND guild_id = ? LIMIT 1`,
-            [tourneyId, guildId]
-        );
+        const tourneyRows = await db<any[]>`
+            SELECT * FROM "tm.tourney" WHERE id = ${tourneyId} AND guild_id = ${guildId} LIMIT 1
+        `;
 
         if (!tourneyRows || tourneyRows.length === 0) {
             return NextResponse.json({ error: 'Tournament not found' }, { status: 404 });
@@ -32,10 +31,9 @@ export async function POST(
 
         if (isCurrentlyOpen) {
             // ===== PAUSE: close registrations =====
-            await db.execute(
-                `UPDATE \`tm.tourney\` SET started_at = NULL, closed_at = ? WHERE id = ?`,
-                [now, tourneyId]
-            );
+            await db`
+                UPDATE "tm.tourney" SET started_at = NULL, closed_at = ${now} WHERE id = ${tourneyId}
+            `;
 
             // Update channel permissions — deny send_messages
             console.log('[Toggle PAUSE] Updating perms for channel:', tourney.registration_channel_id, 'role:', openRoleId);
@@ -91,20 +89,18 @@ export async function POST(
 
         } else {
             // ===== START: open registrations =====
-            const [countRows]: any = await db.execute(
-                `SELECT COUNT(*) AS cnt FROM \`tm.tourney_tm.register\` WHERE \`tm.tourney_id\` = ?`,
-                [tourneyId]
-            );
+            const countRows = await db<any[]>`
+                SELECT COUNT(*) AS cnt FROM "tm.tourney_tm.register" WHERE "tm.tourney_id" = ${tourneyId}
+            `;
             const slotCount = countRows[0]?.cnt || 0;
 
             if (slotCount >= tourney.total_slots) {
                 return NextResponse.json({ error: 'Slots are already full. Increase slots to start again.' }, { status: 400 });
             }
 
-            await db.execute(
-                `UPDATE \`tm.tourney\` SET started_at = ?, closed_at = NULL WHERE id = ?`,
-                [now, tourneyId]
-            );
+            await db`
+                UPDATE "tm.tourney" SET started_at = ${now}, closed_at = NULL WHERE id = ${tourneyId}
+            `;
 
             // Update channel permissions — allow send_messages
             console.log('[Toggle START] Updating perms for channel:', tourney.registration_channel_id, 'role:', openRoleId);

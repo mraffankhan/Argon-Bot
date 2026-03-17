@@ -10,7 +10,7 @@ import itertools
 import os
 import time
 import re
-import aiomysql
+import asyncpg
 from datetime import datetime, timedelta
 
 import warnings
@@ -48,50 +48,21 @@ __all__ = ("Argon", "bot")
 
 on_startup: List[Callable[["Argon"], Coroutine]] = []
 
-class AioMySQLPoolWrapper:
+class AsyncpgPoolWrapper:
     def __init__(self, pool):
         self._pool = pool
 
-    def _convert_query(self, query: str) -> str:
-        # Convert PostgreSQL $n style parameters to MySQL %s parameters
-        # Also replace ON CONFLICT DO NOTHING with INSERT IGNORE (MySQL equivalent)
-        # Note: A real parser might be needed, but simple regex handles most cases.
-        query = re.sub(r'\$\d+', '%s', query)
-        if "ON CONFLICT DO NOTHING" in query:
-            query = query.replace("INSERT INTO", "INSERT IGNORE INTO")
-            query = query.replace(" ON CONFLICT DO NOTHING", "")
-            query = query.replace("ON CONFLICT DO NOTHING", "")
-        return query
-
     async def execute(self, query: str, *args):
-        query = self._convert_query(query)
-        async with self._pool.acquire() as conn:
-            async with conn.cursor() as cur:
-                await cur.execute(query, args)
+        return await self._pool.execute(query, *args)
 
     async def fetch(self, query: str, *args):
-        query = self._convert_query(query)
-        async with self._pool.acquire() as conn:
-            async with conn.cursor(aiomysql.DictCursor) as cur:
-                await cur.execute(query, args)
-                return await cur.fetchall()
+        return await self._pool.fetch(query, *args)
 
     async def fetchrow(self, query: str, *args):
-        query = self._convert_query(query)
-        async with self._pool.acquire() as conn:
-            async with conn.cursor(aiomysql.DictCursor) as cur:
-                await cur.execute(query, args)
-                return await cur.fetchone()
+        return await self._pool.fetchrow(query, *args)
 
     async def fetchval(self, query: str, *args):
-        query = self._convert_query(query)
-        async with self._pool.acquire() as conn:
-            async with conn.cursor() as cur:
-                await cur.execute(query, args)
-                result = await cur.fetchone()
-                if result:
-                    return result[0]
-                return None
+        return await self._pool.fetchval(query, *args)
 
 
 class Argon(commands.AutoShardedBot):
@@ -210,7 +181,7 @@ class Argon(commands.AutoShardedBot):
 
         # Cache the connection pool for direct access
         self._db_pool = Tortoise.get_connection("default")._pool
-        self._db_pool_wrapped = AioMySQLPoolWrapper(self._db_pool)
+        self._db_pool_wrapped = AsyncpgPoolWrapper(self._db_pool)
 
         # Initializing Models (Assigning Bot attribute to all models)
         for mname, model in Tortoise.apps.get("models").items():
@@ -496,9 +467,7 @@ class Argon(commands.AutoShardedBot):
     @property
     async def db_latency(self):
         t1 = time.perf_counter()
-        async with self._db_pool.acquire() as conn:
-            async with conn.cursor() as cur:
-                await cur.execute("SELECT 1")
+        await self._db_pool.execute("SELECT 1")
         t2 = time.perf_counter() - t1
         return f"{t2*1000:.2f} ms"
 

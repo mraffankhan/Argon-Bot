@@ -8,13 +8,12 @@ export async function GET(
     try {
         const { id: guildId } = await params;
 
-        const [rows] = await db.query<any[]>(
-            `SELECT id, guild_id, name, registration_channel_id, slotlist_channel_id, role_id, required_mentions, total_slots, host_id, open_time, opened_at, closed_at, stoggle, ping_role_id, multiregister, autoslotlist, autodelete_rejects, autodelete_extras, teamname_compulsion, no_duplicate_name, open_role_id, start_from 
-             FROM \`sm.scrims\` 
-             WHERE guild_id = ? 
-             ORDER BY open_time ASC`,
-            [guildId]
-        );
+        const rows = await db<any[]>`
+            SELECT id, guild_id, name, registration_channel_id, slotlist_channel_id, role_id, required_mentions, total_slots, host_id, open_time, opened_at, closed_at, stoggle, ping_role_id, multiregister, autoslotlist, autodelete_rejects, autodelete_extras, teamname_compulsion, no_duplicate_name, open_role_id, start_from 
+            FROM "sm.scrims" 
+            WHERE guild_id = ${guildId} 
+            ORDER BY open_time ASC
+        `;
 
         return NextResponse.json(rows || []);
 
@@ -78,17 +77,17 @@ export async function POST(
         // 2. Generate a unique ID (snowflake-like)
         const uniqueId = BigInt(Date.now()) * BigInt(1000) + BigInt(Math.floor(Math.random() * 1000));
 
-        await db.query(`
-            INSERT INTO \`sm.scrims\` (
+        await db`
+            INSERT INTO "sm.scrims" (
                 id, guild_id, name, registration_channel_id, slotlist_channel_id, role_id, 
                 total_slots, required_mentions, ping_role_id, host_id, open_time, 
                 stoggle, autoslotlist, autodelete_extras, start_from
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `, [
-            uniqueId.toString(), guildId, name, registration_channel_id, slotlist_channel_id, role.id,
-            total_slots, required_mentions, ping_role_id || null, host_id, open_time,
-            1, 1, 1, 1
-        ]);
+            ) VALUES (
+                ${uniqueId.toString()}, ${guildId}, ${name}, ${registration_channel_id}, ${slotlist_channel_id}, ${role.id},
+                ${total_slots}, ${required_mentions}, ${ping_role_id || null}, ${host_id}, ${open_time},
+                1, 1, 1, 1
+            )
+        `;
 
         return NextResponse.json({
             id: uniqueId.toString(), guild_id: guildId, name, registration_channel_id, slotlist_channel_id,

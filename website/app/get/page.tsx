@@ -25,7 +25,7 @@ export default function GetPage() {
                             Click below to invite Potato Bot to your Discord server with full permissions.
                         </p>
                         <Link
-                            href="https://discord.com/oauth2/authorize?client_id=1470031097357140063&permissions=8&integration_type=0&scope=applications.commands+bot+"
+                            href="https://discord.com/oauth2/authorize?client_id=1470031097357140063&permissions=8&scope=bot+applications.commands"
                             target="_blank"
                             className="inline-flex items-center gap-2 px-6 py-3 bg-cyan-500 text-black font-bold rounded-xl hover:bg-cyan-400 transition-colors"
                         >

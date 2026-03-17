@@ -9,18 +9,16 @@ export async function GET(
         const { id: guildId } = await params;
 
         // Fetch tickets for this guild
-        const [tickets] = await db.query<any[]>(
-            `SELECT id, guild_id, channel_id, opener_id, config_id, opened_at, closed_at, closed_by, reason 
-             FROM \`tickets\` WHERE guild_id = ? ORDER BY opened_at DESC`,
-            [guildId]
-        );
+        const tickets = await db<any[]>`
+            SELECT id, guild_id, channel_id, opener_id, config_id, opened_at, closed_at, closed_by, reason 
+            FROM tickets WHERE guild_id = ${guildId} ORDER BY opened_at DESC
+        `;
 
         // Fetch ticket configs for this guild to get panel titles
-        const [configs] = await db.query<any[]>(
-            `SELECT id, title, channel_id, category_id, support_role_id, log_channel_id, max_tickets 
-             FROM \`ticket_configs\` WHERE guild_id = ?`,
-            [guildId]
-        );
+        const configs = await db<any[]>`
+            SELECT id, title, channel_id, category_id, support_role_id, log_channel_id, max_tickets 
+            FROM ticket_configs WHERE guild_id = ${guildId}
+        `;
 
         // Build a map of config_id -> title
         const configMap: Record<number, string> = {};
@@ -62,32 +60,30 @@ export async function PATCH(
         if (action === 'close') {
             try {
                 const now = new Date().toISOString();
-                await db.query(
-                    `UPDATE \`tickets\` SET closed_at = ?, closed_by = ? WHERE id = ? AND guild_id = ?`,
-                    [now, userId || null, ticketId, guildId]
-                );
+                const rows = await db<any[]>`
+                    UPDATE tickets SET closed_at = ${now}, closed_by = ${userId || null} 
+                    WHERE id = ${ticketId} AND guild_id = ${guildId}
+                    RETURNING *
+                `;
 
-                // Fetch the updated ticket
-                const [rows] = await db.query<any[]>(`SELECT * FROM \`tickets\` WHERE id = ? AND guild_id = ?`, [ticketId, guildId]);
                 return NextResponse.json({ success: true, ticket: rows[0] });
             } catch (error) {
-                console.error('MySQL error closing ticket:', error);
+                console.error('PostgreSQL error closing ticket:', error);
                 return NextResponse.json({ error: 'Failed to close ticket' }, { status: 500 });
             }
         }
 
         if (action === 'reopen') {
             try {
-                await db.query(
-                    `UPDATE \`tickets\` SET closed_at = NULL, closed_by = NULL WHERE id = ? AND guild_id = ?`,
-                    [ticketId, guildId]
-                );
+                const rows = await db<any[]>`
+                    UPDATE tickets SET closed_at = NULL, closed_by = NULL 
+                    WHERE id = ${ticketId} AND guild_id = ${guildId}
+                    RETURNING *
+                `;
 
-                // Fetch the updated ticket
-                const [rows] = await db.query<any[]>(`SELECT * FROM \`tickets\` WHERE id = ? AND guild_id = ?`, [ticketId, guildId]);
                 return NextResponse.json({ success: true, ticket: rows[0] });
             } catch (error) {
-                console.error('MySQL error reopening ticket:', error);
+                console.error('PostgreSQL error reopening ticket:', error);
                 return NextResponse.json({ error: 'Failed to reopen ticket' }, { status: 500 });
             }
         }

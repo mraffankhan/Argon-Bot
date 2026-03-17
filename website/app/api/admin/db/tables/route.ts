@@ -12,24 +12,22 @@ export async function POST(req: Request) {
         }
 
         // 2. Fetch all public tables from information_schema
-        const [tables]: any = await db.execute(`
+        const tables = await db`
             SELECT table_name 
             FROM information_schema.tables 
-            WHERE table_schema = 's1336_Argon' 
+            WHERE table_schema = 'public' 
             ORDER BY table_name;
-        `);
+        `;
 
-        // 3. Fetch total database size in bytes
-        const [sizeRes]: any = await db.execute(`
-            SELECT SUM(data_length + index_length) AS total_bytes
-            FROM information_schema.tables 
-            WHERE table_schema = 's1336_Argon';
-        `);
+        // 3. Fetch total database size in bytes using PostgreSQL pg_database_size
+        const sizeRes = await db`
+            SELECT pg_database_size(current_database()) AS total_bytes
+        `;
         const usedBytes = Number(sizeRes[0]?.total_bytes) || 0;
         const totalBytes = Number(process.env.DB_MAX_STORAGE_MB || 1024) * 1024 * 1024; // Default 1GB
 
         // 4. Return array of table names and storage data
-        const tableNames = tables.map((t: any) => t.TABLE_NAME || t.table_name);
+        const tableNames = tables.map((t: any) => t.table_name);
         return NextResponse.json({
             tables: tableNames,
             storage: {

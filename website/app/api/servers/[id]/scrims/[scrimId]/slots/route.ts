@@ -9,23 +9,23 @@ export async function GET(
         const { scrimId } = await params;
 
         // Get slot IDs from the join table
-        const [slotJoins] = await db.query<any[]>(
-            `SELECT assignedslot_id FROM \`sm.scrims_sm.assigned_slots\` WHERE \`sm.scrims_id\` = ?`,
-            [scrimId]
-        );
+        const slotJoins = await db<any[]>`
+            SELECT assignedslot_id FROM "sm.scrims_sm.assigned_slots" WHERE "sm.scrims_id" = ${scrimId}
+        `;
 
         if (!slotJoins || slotJoins.length === 0) {
             return NextResponse.json([]);
         }
 
         const slotIds = slotJoins.map((j: any) => j.assignedslot_id);
-        const placeholders = slotIds.map(() => '?').join(',');
 
         // Get the actual slot data
-        const [slots] = await db.query<any[]>(
-            `SELECT id, num, user_id, team_name, members, jump_url FROM \`sm.assigned_slots\` WHERE id IN (${placeholders}) ORDER BY num ASC`,
-            slotIds
-        );
+        const slots = await db<any[]>`
+            SELECT id, num, user_id, team_name, members, jump_url 
+            FROM "sm.assigned_slots" 
+            WHERE id IN ${db(slotIds)} 
+            ORDER BY num ASC
+        `;
 
         return NextResponse.json(slots || []);
 
@@ -48,16 +48,12 @@ export async function DELETE(
         }
 
         // Remove from join table
-        await db.query(
-            `DELETE FROM \`sm.scrims_sm.assigned_slots\` WHERE \`sm.scrims_id\` = ? AND assignedslot_id = ?`,
-            [scrimId, slotId]
-        );
+        await db`
+            DELETE FROM "sm.scrims_sm.assigned_slots" WHERE "sm.scrims_id" = ${scrimId} AND assignedslot_id = ${slotId}
+        `;
 
         // Delete the slot itself
-        await db.query(
-            `DELETE FROM \`sm.assigned_slots\` WHERE id = ?`,
-            [slotId]
-        );
+        await db`DELETE FROM "sm.assigned_slots" WHERE id = ${slotId}`;
 
         return NextResponse.json({ success: true });
 

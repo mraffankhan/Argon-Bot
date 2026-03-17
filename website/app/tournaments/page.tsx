@@ -7,14 +7,14 @@ export const dynamic = "force-dynamic";
 export const revalidate = 60;
 
 export default async function TournamentsPage() {
-    let tournaments = [];
+    let tournaments: any[] = [];
     try {
-        const [tourneyRows]: any = await db.execute(
-            `SELECT t.*, 
-                (SELECT COUNT(*) FROM \`tm.tourney_tm.register\` j WHERE j.\`tm.tourney_id\` = t.id) AS registration_count
-             FROM \`tm.tourney\` t
-             ORDER BY t.id DESC`
-        );
+        const tourneyRows = await db<any[]>`
+            SELECT t.*, 
+                (SELECT COUNT(*) FROM "tm.tourney_tm.register" j WHERE j."tm.tourney_id" = t.id) AS registration_count
+            FROM "tm.tourney" t
+            ORDER BY t.id DESC
+        `;
         tournaments = tourneyRows || [];
     } catch (error) {
         console.error("Failed to fetch tournaments:", error);

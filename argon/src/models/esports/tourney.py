@@ -438,16 +438,15 @@ class Tourney(BaseDbModel):
             return True
 
     async def check_fake_tags(self, message: discord.Message):
-        import json
-        mentions_json = json.dumps([i.id for i in message.mentions])
+        mentions = [i.id for i in message.mentions]
         query = """
         SELECT *
-            FROM `tm.tourney_tm.register` AS ASSIGNED_SLOT
-            INNER JOIN `tm.register` AS SLOTS ON SLOTS.ID = ASSIGNED_SLOT.TMSLOT_ID
-        WHERE ASSIGNED_SLOT.`tm.tourney_id` = %s
-        AND JSON_OVERLAPS(%s, SLOTS.MEMBERS);
+            FROM "tm.tourney_tm.register" AS ASSIGNED_SLOT
+            INNER JOIN "tm.register" AS SLOTS ON SLOTS.id = ASSIGNED_SLOT.tmslot_id
+        WHERE ASSIGNED_SLOT."tm.tourney_id" = $1
+        AND SLOTS.members && $2;
         """
-        return await self.bot.db.fetch(query, self.id, mentions_json)
+        return await self.bot.db.fetch(query, self.id, mentions)
 
 
 class TMSlot(BaseDbModel):

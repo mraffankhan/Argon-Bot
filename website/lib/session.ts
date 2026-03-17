@@ -42,8 +42,10 @@ export const sessionConfig = {
     options: {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax' as const,
+        sameSite: 'lax' as const, // Must be lax or none for OAuth redirects depending on domain
         path: '/',
+        // Ensure standard maxAge is set as well for fallback
+        maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
     }
 };
 

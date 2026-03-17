@@ -9,26 +9,23 @@ export async function GET(
         const { tourneyId } = await params;
 
         // Get slot IDs from junction table
-        const [junctionRows]: any = await db.execute(
-            `SELECT tmslot_id FROM \`tm.tourney_tm.register\` WHERE \`tm.tourney_id\` = ?`,
-            [tourneyId]
-        );
+        const junctionRows = await db<any[]>`
+            SELECT tmslot_id FROM "tm.tourney_tm.register" WHERE "tm.tourney_id" = ${tourneyId}
+        `;
 
         if (!junctionRows || junctionRows.length === 0) {
             return NextResponse.json([]);
         }
 
         const slotIds = junctionRows.map((j: any) => j.tmslot_id);
-        const placeholders = slotIds.map(() => '?').join(',');
 
         // Get actual slot data
-        const [slots]: any = await db.execute(
-            `SELECT id, num, team_name, leader_id, members, jump_url, confirm_jump_url 
-             FROM \`tm.register\` 
-             WHERE id IN (${placeholders}) 
-             ORDER BY num ASC`,
-            slotIds
-        );
+        const slots = await db<any[]>`
+            SELECT id, num, team_name, leader_id, members, jump_url, confirm_jump_url 
+            FROM "tm.register" 
+            WHERE id IN ${db(slotIds)} 
+            ORDER BY num ASC
+        `;
 
         return NextResponse.json(slots || []);
 
@@ -51,16 +48,12 @@ export async function DELETE(
         }
 
         // Remove from junction table
-        await db.execute(
-            `DELETE FROM \`tm.tourney_tm.register\` WHERE \`tm.tourney_id\` = ? AND tmslot_id = ?`,
-            [tourneyId, slotId]
-        );
+        await db`
+            DELETE FROM "tm.tourney_tm.register" WHERE "tm.tourney_id" = ${tourneyId} AND tmslot_id = ${slotId}
+        `;
 
         // Delete the slot itself
-        await db.execute(
-            `DELETE FROM \`tm.register\` WHERE id = ?`,
-            [slotId]
-        );
+        await db`DELETE FROM "tm.register" WHERE id = ${slotId}`;
 
         return NextResponse.json({ success: true });
 

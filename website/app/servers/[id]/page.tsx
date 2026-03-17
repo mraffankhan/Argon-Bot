@@ -324,7 +324,7 @@ export default function ServerManagePage({ params }: { params: Promise<{ id: str
                 </div>
                 <button
                     onClick={() => {
-                        router.push('/api/auth/discord');
+                        window.location.href = '/api/auth/discord';
                     }}
                     className="px-8 py-3 bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center gap-2"
                 >

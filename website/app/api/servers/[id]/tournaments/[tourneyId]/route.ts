@@ -8,20 +8,18 @@ export async function GET(
     try {
         const { id: guildId, tourneyId } = await params;
 
-        const [rows]: any = await db.execute(
-            `SELECT * FROM \`tm.tourney\` WHERE id = ? AND guild_id = ? LIMIT 1`,
-            [tourneyId, guildId]
-        );
+        const rows = await db<any[]>`
+            SELECT * FROM "tm.tourney" WHERE id = ${tourneyId} AND guild_id = ${guildId} LIMIT 1
+        `;
 
         if (!rows || rows.length === 0) {
             return NextResponse.json({ error: 'Tournament not found' }, { status: 404 });
         }
 
         // Get slot count
-        const [countRows]: any = await db.execute(
-            `SELECT COUNT(*) AS cnt FROM \`tm.tourney_tm.register\` WHERE \`tm.tourney_id\` = ?`,
-            [tourneyId]
-        );
+        const countRows = await db<any[]>`
+            SELECT COUNT(*) AS cnt FROM "tm.tourney_tm.register" WHERE "tm.tourney_id" = ${tourneyId}
+        `;
 
         return NextResponse.json({ ...rows[0], slot_count: countRows[0]?.cnt || 0 });
 
@@ -47,32 +45,25 @@ export async function PATCH(
             'registration_channel_id', 'confirm_channel_id', 'ping_role_id',
         ];
 
-        const setClauses: string[] = [];
-        const values: any[] = [];
+        const updates: Record<string, any> = {};
         for (const field of allowedFields) {
             if (body[field] !== undefined) {
-                setClauses.push(`\`${field}\` = ?`);
-                values.push(body[field]);
+                updates[field] = body[field];
             }
         }
 
-        if (setClauses.length === 0) {
+        if (Object.keys(updates).length === 0) {
             return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });
         }
 
-        values.push(tourneyId, guildId);
-        await db.execute(
-            `UPDATE \`tm.tourney\` SET ${setClauses.join(', ')} WHERE id = ? AND guild_id = ?`,
-            values
-        );
+        // postgres.js helper for dynamic updates
+        const result = await db`
+            UPDATE "tm.tourney" SET ${db(updates)} 
+            WHERE id = ${tourneyId} AND guild_id = ${guildId}
+            RETURNING *
+        `;
 
-        // Fetch updated record
-        const [updated]: any = await db.execute(
-            `SELECT * FROM \`tm.tourney\` WHERE id = ? AND guild_id = ? LIMIT 1`,
-            [tourneyId, guildId]
-        );
-
-        return NextResponse.json({ success: true, tournament: updated[0] });
+        return NextResponse.json({ success: true, tournament: result[0] });
 
     } catch (error) {
         console.error('Error updating tournament:', error);
@@ -89,10 +80,9 @@ export async function DELETE(
         const botToken = process.env.DISCORD_BOT_TOKEN;
 
         // 1. Get tournament to find the role_id
-        const [tourneyRows]: any = await db.execute(
-            `SELECT role_id FROM \`tm.tourney\` WHERE id = ? AND guild_id = ? LIMIT 1`,
-            [tourneyId, guildId]
-        );
+        const tourneyRows = await db<any[]>`
+            SELECT role_id FROM "tm.tourney" WHERE id = ${tourneyId} AND guild_id = ${guildId} LIMIT 1
+        `;
 
         if (!tourneyRows || tourneyRows.length === 0) {
             return NextResponse.json({ error: 'Tournament not found' }, { status: 404 });
@@ -100,23 +90,20 @@ export async function DELETE(
         const tourney = tourneyRows[0];
 
         // 2. Delete associated slots
-        const [junctionRows]: any = await db.execute(
-            `SELECT tmslot_id FROM \`tm.tourney_tm.register\` WHERE \`tm.tourney_id\` = ?`,
-            [tourneyId]
-        );
+        const junctionRows = await db<any[]>`
+            SELECT tmslot_id FROM "tm.tourney_tm.register" WHERE "tm.tourney_id" = ${tourneyId}
+        `;
 
         if (junctionRows && junctionRows.length > 0) {
             const slotIds = junctionRows.map((j: any) => j.tmslot_id);
-            const placeholders = slotIds.map(() => '?').join(',');
-            await db.execute(`DELETE FROM \`tm.register\` WHERE id IN (${placeholders})`, slotIds);
-            await db.execute(`DELETE FROM \`tm.tourney_tm.register\` WHERE \`tm.tourney_id\` = ?`, [tourneyId]);
+            await db`DELETE FROM "tm.register" WHERE id IN ${db(slotIds)}`;
+            await db`DELETE FROM "tm.tourney_tm.register" WHERE "tm.tourney_id" = ${tourneyId}`;
         }
 
-        // 3. Delete tournament from MySQL
-        await db.execute(
-            `DELETE FROM \`tm.tourney\` WHERE id = ? AND guild_id = ?`,
-            [tourneyId, guildId]
-        );
+        // 3. Delete tournament from PostgreSQL
+        await db`
+            DELETE FROM "tm.tourney" WHERE id = ${tourneyId} AND guild_id = ${guildId}
+        `;
 
         // 4. Delete Discord role
         if (botToken && tourney.role_id) {

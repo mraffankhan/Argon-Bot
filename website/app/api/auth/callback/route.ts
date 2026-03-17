@@ -4,9 +4,9 @@ import { createSession, sessionConfig } from '@/lib/session';
 export async function GET(req: NextRequest) {
     const DISCORD_CLIENT_ID = (process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID || '1470031097357140063').trim();
     const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET?.trim();
-    const REDIRECT_URI = process.env.NODE_ENV === 'production'
+    const REDIRECT_URI = (process.env.NODE_ENV === 'production'
         ? 'https://ravonixx.xyz/api/auth/callback'
-        : 'http://localhost:3000/api/auth/callback';
+        : 'http://localhost:3000/api/auth/callback').trim();
 
     const url = new URL(req.url);
     const code = url.searchParams.get('code');
@@ -64,8 +64,9 @@ export async function GET(req: NextRequest) {
         });
 
         if (!userResponse.ok) {
-            console.error('Failed to fetch user profile');
-            return NextResponse.redirect(new URL('/?error=profile_failed', req.url));
+            const userDataError = await userResponse.json().catch(() => ({}));
+            console.error('Failed to fetch user profile:', userDataError);
+            return NextResponse.redirect(new URL(`/?error=profile_failed&details=${encodeURIComponent(JSON.stringify(userDataError))}`, req.url));
         }
 
         const userData = await userResponse.json();

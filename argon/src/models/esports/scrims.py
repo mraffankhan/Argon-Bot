@@ -631,16 +631,15 @@ class Scrim(BaseDbModel):
         return await Scrim.filter(guild_id=guild_id).count()
 
     async def check_fake_tags(self, message: discord.Message):
-        import json
-        mentions_json = json.dumps([i.id for i in message.mentions])
+        mentions = [i.id for i in message.mentions]
         query = """
         SELECT *
-            FROM `sm.scrims_sm.assigned_slots` AS ASSIGNED_SLOT
-            INNER JOIN `sm.assigned_slots` AS SLOTS ON SLOTS.ID = ASSIGNED_SLOT.ASSIGNEDSLOT_ID
-        WHERE ASSIGNED_SLOT.`sm.scrims_id` = %s
-        AND JSON_OVERLAPS(%s, SLOTS.MEMBERS);
+            FROM "sm.scrims_sm.assigned_slots" AS ASSIGNED_SLOT
+            INNER JOIN "sm.assigned_slots" AS SLOTS ON SLOTS.id = ASSIGNED_SLOT.assignedslot_id
+        WHERE ASSIGNED_SLOT."sm.scrims_id" = $1
+        AND SLOTS.members && $2;
         """
-        return await self.bot.db.fetch(query, self.id, mentions_json)
+        return await self.bot.db.fetch(query, self.id, mentions)
 
 
 class BaseSlot(models.Model):

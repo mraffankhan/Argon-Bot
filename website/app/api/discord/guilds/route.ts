@@ -95,14 +95,14 @@ export async function POST(req: NextRequest) {
         let botGuildsData: any[] = [];
         if (guildIds.length > 0) {
             try {
-                const placeholders = guildIds.map(() => '?').join(',');
-                const [rows] = await db.query(
-                    `SELECT guild_id, is_premium, prefix FROM guild_data WHERE guild_id IN (${placeholders})`,
-                    guildIds
-                );
-                botGuildsData = rows as any[];
+                // Using postgres.js array expansion for the IN clause
+                botGuildsData = await db`
+                    SELECT guild_id, is_premium, prefix 
+                    FROM guild_data 
+                    WHERE guild_id IN ${db(guildIds)}
+                `;
             } catch (err) {
-                console.error('MySQL fetch error:', err);
+                console.error('PostgreSQL fetch error:', err);
             }
         }
 

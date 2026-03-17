@@ -28,24 +28,22 @@ export async function GET(
         }
 
         // 1. Fetch Guild Premium Status
-        const [guildRows] = await db.query<any[]>(
-            `SELECT is_premium, premium_end_time, made_premium_by FROM \`guild_data\` WHERE guild_id = ?`,
-            [guildId]
-        );
+        const guildRows = await db<any[]>`
+            SELECT is_premium, premium_end_time, made_premium_by FROM guild_data WHERE guild_id = ${guildId}
+        `;
         const guild = guildRows[0] || null;
 
         // 2. Fetch Premium Plans
-        const [plans] = await db.query<any[]>(
-            `SELECT * FROM \`premium_plans\` ORDER BY price ASC`
-        );
+        const plans = await db<any[]>`
+            SELECT * FROM premium_plans ORDER BY price ASC
+        `;
 
         // 3. Fetch User Premium Status
         let userData = null;
         if (userId) {
-            const [userRows] = await db.query<any[]>(
-                `SELECT is_premium, premium_expire_time FROM \`user_data\` WHERE user_id = ?`,
-                [userId]
-            );
+            const userRows = await db<any[]>`
+                SELECT is_premium, premium_expire_time FROM user_data WHERE user_id = ${userId}
+            `;
             if (userRows.length > 0) userData = userRows[0];
         }
 

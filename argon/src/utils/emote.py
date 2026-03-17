@@ -20,8 +20,8 @@ diamond = "<a:diamond:899295009289949235>"
 
 error = "❗"
 
-server = "<:server:775586933396078612>"
-privacy = "<:privacy:775586938659799060>"
+server = "<a:argon_dot:1477976284796551259>"
+privacy = "<:argon_guard:1477976280715493406>"
 
 one = "1️⃣"
 two = "2️⃣"
@@ -50,7 +50,7 @@ verified_bot = "<:verifiedbot1:833991773248290817><:verifiedbot2:833991793683070
 
 check = "<a:argon_che:1472164820483571824>"
 xmark = "<a:wrong:1470649315398778965>"
-loading = "<a:loading:815826684262744124>"
+loading = "<a:argon_thunder:1477976274130571294>"
 VoiceChannel = "<:voice:815827186116198430>"
 TextChannel = "<:text:815827264679706624>"
 category = "<:category:815831557507776583>"

@@ -2,56 +2,73 @@
 @plugin "tailwindcss-animate";
 
 @theme {
-  --color-primary: #7c3aed;
-  --color-primary-glow: #7c3aed80;
-  --color-secondary: #0ea5e9;
-  --color-secondary-glow: #0ea5e980;
-  --color-black-DEFAULT: #0a0a0f;
-  --color-background: #0a0a0f;
+  --color-primary: #3b82f6;
+  --color-primary-light: #60a5fa;
+  --color-secondary: #8b5cf6;
+  --color-accent: #10b981;
+  --color-background: #000000;
+  --color-surface: #0a0a0a;
   --color-foreground: #ffffff;
-
-  --font-sans: var(--font-inter);
+  
+  --font-sans: "Geist Sans", var(--font-inter), sans-serif;
+  --font-mono: "Geist Mono", monospace;
 }
 
 :root {
-  --background: #0a0a0f;
+  --background: #000000;
   --foreground: #ffffff;
+  --primary: #3b82f6;
+  --secondary: #8b5cf6;
+  --accent: #10b981;
+  --surface: #0a0a0a;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
-  background-image: 
-    radial-gradient(circle at 15% 50%, rgba(124, 58, 237, 0.08), transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(14, 165, 233, 0.08), transparent 25%);
-  min-height: 100vh;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@utility cyan-glow {
-  box-shadow: 0 0 15px var(--color-secondary-glow);
+@utility glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-@utility text-glow {
-  text-shadow: 0 0 15px var(--color-primary-glow);
+@utility glass-darker {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-@utility glass-panel {
-  background-color: rgba(10, 10, 15, 0.6);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(124, 58, 237, 0.2);
+@utility text-gradient {
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-image: linear-gradient(to right, var(--color-primary), var(--color-secondary));
 }
 
-.animate-in {
-  animation: fadeSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+@utility border-gradient {
+  border-image: linear-gradient(to right, var(--color-primary), var(--color-secondary)) 1;
 }
 
-@keyframes fadeSlideIn {
+@layer base {
+  * {
+    @apply border-white/10;
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.5s ease-out forwards;
+}
+
+@keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(10px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);

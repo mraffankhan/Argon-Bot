@@ -9,10 +9,9 @@ export async function GET(
         const { id: guildId } = await params;
         console.log(`[Welcome API] GET request for guildId: ${guildId}`);
 
-        const [rows] = await db.query<any[]>(
-            `SELECT guild_id, channel_id, message, enabled, embed_enabled, embed_color, embed_title FROM welcome_configs WHERE guild_id = ? LIMIT 1`,
-            [guildId]
-        );
+        const rows = await db<any[]>`
+            SELECT guild_id, channel_id, message, enabled, embed_enabled, embed_color, embed_title FROM welcome_configs WHERE guild_id = ${guildId} LIMIT 1
+        `;
         const data = rows.length > 0 ? rows[0] : null;
 
         const welcomeData = data || {
@@ -48,32 +47,27 @@ export async function PUT(
         // Always override guild_id from params, discarding body's potentially precision-lost value
         body.guild_id = guildId;
 
-
-        await db.query(`
+        // PostgreSQL syntax for ON CONFLICT
+        await db`
             INSERT INTO welcome_configs (
                 guild_id, channel_id, message, enabled, embed_enabled, embed_color, embed_title
-            ) VALUES (?, ?, ?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE
-                channel_id = VALUES(channel_id),
-                message = VALUES(message),
-                enabled = VALUES(enabled),
-                embed_enabled = VALUES(embed_enabled),
-                embed_color = VALUES(embed_color),
-                embed_title = VALUES(embed_title)
-        `, [
-            guildId,
-            body.channel_id || null,
-            body.message || '',
-            body.enabled ? 1 : 0,
-            body.embed_enabled ? 1 : 0,
-            body.embed_color || 0,
-            body.embed_title || ''
-        ]);
+            ) VALUES (
+                ${guildId}, ${body.channel_id || null}, ${body.message || ''}, 
+                ${body.enabled ? 1 : 0}, ${body.embed_enabled ? 1 : 0}, 
+                ${body.embed_color || 0}, ${body.embed_title || ''}
+            )
+            ON CONFLICT (guild_id) DO UPDATE SET
+                channel_id = EXCLUDED.channel_id,
+                message = EXCLUDED.message,
+                enabled = EXCLUDED.enabled,
+                embed_enabled = EXCLUDED.embed_enabled,
+                embed_color = EXCLUDED.embed_color,
+                embed_title = EXCLUDED.embed_title
+        `;
 
-        const [rows] = await db.query<any[]>(
-            `SELECT guild_id, channel_id, message, enabled, embed_enabled, embed_color, embed_title FROM welcome_configs WHERE guild_id = ? LIMIT 1`,
-            [guildId]
-        );
+        const rows = await db<any[]>`
+            SELECT guild_id, channel_id, message, enabled, embed_enabled, embed_color, embed_title FROM welcome_configs WHERE guild_id = ${guildId} LIMIT 1
+        `;
         const data = rows[0];
 
         // Always use original guildId from URL params to ensure perfect precision

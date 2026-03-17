@@ -1,11 +1,12 @@
-import mysql from 'mysql2/promise';
+import postgres from 'postgres';
 
-export const db = mysql.createPool({
-    host: process.env.DB_HOST || 'localhost',
-    port: Number(process.env.DB_PORT) || 3306,
-    database: process.env.DB_NAME || '',
-    user: process.env.DB_USER || '',
-    password: process.env.DB_PASSWORD || '',
-    connectionLimit: 10,
-    waitForConnections: true
+const sql = postgres({
+    host: process.env.DB_HOST || 'db.fwywdcoiudevrssihfuf.supabase.co',
+    port: Number(process.env.DB_PORT) || 5432,
+    database: process.env.DB_NAME || 'postgres',
+    username: process.env.DB_USER || 'postgres',
+    password: process.env.DB_PASSWORD || 'affan@805032',
+    ssl: { rejectUnauthorized: false }
 });
+
+export const db = sql;

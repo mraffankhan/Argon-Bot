@@ -179,7 +179,7 @@ export default function ServersPage() {
                             Argon is not in any of your admin servers. Add the bot to a server first.
                         </p>
                         <a
-                            href={`https://discord.com/oauth2/authorize?client_id=${process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID || "1470031097357140063"}&permissions=8&integration_type=0&scope=applications.commands+bot`}
+                            href={`https://discord.com/oauth2/authorize?client_id=${process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID || "1470031097357140063"}&permissions=8&scope=bot+applications.commands`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-block mt-6 px-6 py-3 bg-primary hover:bg-primary/80 text-black font-bold rounded-lg transition-all"
