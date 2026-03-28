@@ -1,0 +1,28 @@
+﻿git : remote: error: Trace: 93967e74e0710211
+c7d9b1e6130abe6c2c9a1496a8d078af552262b376c9
+16fc        
+At line:1 char:1
++ git push -uf https://github.com/mraffankha
+n/Argon-Bot.git main 2>&1 | ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpe    
+cified: (remote: error: ...6c916    fc      
+  :String) [], RemoteExc    eption
+    + FullyQualifiedErrorId : Native    
+CommandError
+ 
+remote: error: See https://gh.io/lfs for 
+more information.        
+remote: error: File argon.zip is 178.30 MB; 
+this exceeds GitHub's file size limit of 
+100.00 MB        
+remote: error: GH001: Large files detected. 
+You may want to try Git Large File Storage 
+- https://git-lfs.github.com.        
+To 
+https://github.com/mraffankhan/Argon-Bot.git
+ ! [remote rejected] main -> main 
+(pre-receive hook declined)
+error: failed to push some refs to 'https://
+github.com/mraffankhan/Argon-Bot.git'

@@ -1,147 +1,81 @@
 "use client";
 
-import { Crown, Check, Star, Sparkles, Shield, Zap } from "lucide-react";
+import { Crown, Sparkles, Shield, Rocket } from "lucide-react";
 import Link from "next/link";
-
-const plans = [
-    {
-        name: "Weekly Plan",
-        price: "₹29",
-        duration: "7 days",
-        description: "Perfect for testing the waters.",
-        features: ["Server Premium Status", "Unlimited Scrims", "Basic Support"],
-        highlight: false,
-        color: "text-white"
-    },
-    {
-        name: "Monthly Plan",
-        price: "₹79",
-        duration: "1 month",
-        description: "Our most popular starter plan.",
-        features: ["All Weekly Features", "Priority Support", "Custom Bot Status"],
-        highlight: true,
-        color: "text-primary"
-    },
-    {
-        name: "No Prefix Plan",
-        price: "₹99",
-        duration: "1 month",
-        description: "Exclusive access to No Prefix commands.",
-        features: ["No Prefix Commands", "Personal Badge", "Priority Support"],
-        highlight: true,
-        color: "text-purple-400",
-        icon: <Zap size={24} className="text-purple-400" />
-    },
-    {
-        name: "Quarterly Plan",
-        price: "₹199",
-        duration: "3 months",
-        description: "Save big with a quarterly commitment.",
-        features: ["All Monthly Features", "Advanced Analytics", "24/7 Support"],
-        highlight: false,
-        color: "text-yellow-400"
-    },
-    {
-        name: "Half-Yearly Plan",
-        price: "₹349",
-        duration: "6 months",
-        description: "Best value for long-term growth.",
-        features: ["All Quarterly Features", "Dedicated Manager", "Early Access to Features"],
-        highlight: false,
-        color: "text-blue-400"
-    },
-    {
-        name: "GodLike Plan",
-        price: "₹4999",
-        duration: "Lifetime",
-        description: "One-time payment for eternal glory.",
-        features: ["Lifetime Access", "All Future Features", "VVIP Support", "Developer Access"],
-        highlight: true,
-        color: "text-red-500",
-        icon: <Crown size={24} className="text-red-500 fill-red-500 animate-pulse" />
-    }
-];
+import { motion } from "framer-motion";
 
 export default function PremiumPage() {
     return (
-        <div className="min-h-screen bg-black pt-24 pb-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-7xl mx-auto">
-                <div className="text-center mb-16 space-y-4">
-                    <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight">
-                        UNLEASH THE <span className="text-primary">POWER</span>
+        <div className="min-h-screen bg-black pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+            {/* Background elements */}
+            <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-full max-w-3xl h-[400px] bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
+            
+            <div className="max-w-4xl mx-auto text-center relative z-10">
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="mb-12"
+                >
+                    <div className="w-24 h-24 mx-auto rounded-3xl bg-gradient-to-br from-primary/30 to-primary/5 flex items-center justify-center border border-primary/20 shadow-[0_0_50px_rgba(255,255,255,0.05)] mb-8 ring-1 ring-white/10">
+                        <Crown size={48} className="text-primary drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]" />
+                    </div>
+                    
+                    <h1 className="text-5xl md:text-7xl font-black text-white italic uppercase tracking-tighter mb-6 drop-shadow-xl inline-block relative">
+                        PREMIUM <span className="text-primary glow-text">ACCESS</span>
                     </h1>
-                    <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                        Upgrade your server or account to unlock premium features, unlimited limits, and exclusive tools.
-                    </p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {plans.map((plan, idx) => (
-                        <div
-                            key={idx}
-                            className={`relative group bg-white/5 border rounded-2xl p-8 transition-all hover:-translate-y-2 hover:shadow-[0_0_30px_rgba(0,0,0,0.3)]
-                                ${plan.highlight ? 'border-primary/50 shadow-lg shadow-primary/10' : 'border-white/10 hover:border-white/30'}
-                            `}
-                        >
-                            {plan.highlight && (
-                                <div className={`absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-current to-transparent opacity-50 ${plan.color.replace('text-', 'text-')}`} />
-                            )}
-
-                            <div className="flex justify-between items-start mb-6">
-                                <div>
-                                    <h3 className={`text-xl font-bold ${plan.color}`}>{plan.name}</h3>
-                                    <p className="text-gray-500 text-sm mt-1">{plan.duration}</p>
-                                </div>
-                                {plan.icon || <Star className={`${plan.color} opacity-80`} size={24} />}
-                            </div>
-
-                            <div className="mb-6">
-                                <span className="text-4xl font-bold text-white">{plan.price}</span>
-                                <span className="text-gray-500 ml-2 text-sm">/ {plan.duration}</span>
-                            </div>
-
-                            <p className="text-gray-400 text-sm mb-8 min-h-[40px]">{plan.description}</p>
-
-                            <ul className="space-y-4 mb-8">
-                                {plan.features.map((feat, i) => (
-                                    <li key={i} className="flex items-center gap-3 text-sm text-gray-300">
-                                        <Check size={16} className={`shrink-0 ${plan.color}`} />
-                                        <span>{feat}</span>
-                                    </li>
-                                ))}
-                            </ul>
-
-                            <a
-                                href="https://discord.gg/ZT4KXFK3RD"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={`block w-full py-3 rounded-xl font-bold text-center transition-all
-                                    ${plan.highlight
-                                        ? 'bg-primary hover:bg-primary/90 text-black shadow-[0_0_20px_var(--color-primary-glow)]'
-                                        : 'bg-white/10 hover:bg-white/20 text-white hover:text-primary'}
-                                `}
-                            >
-                                Get Started
-                            </a>
+                    
+                    <div className="mt-8 inline-flex flex-col items-center glass px-10 py-8 rounded-[2rem] border border-white/10 shadow-2xl relative overflow-hidden group max-w-2xl mx-auto backdrop-blur-xl">
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-[150%] animate-[shimmer_3s_infinite]" />
+                        
+                        <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 text-2xl sm:text-3xl md:text-4xl font-black text-white mb-4 tracking-tight drop-shadow-md text-center">
+                            <Sparkles size={32} className="text-primary animate-pulse hidden md:block" />
+                            <span>ALL FEATURES ARE FREE</span>
+                            <Sparkles size={32} className="text-primary animate-pulse hidden md:block" />
                         </div>
-                    ))}
-                </div>
+                        <p className="text-gray-400 md:text-lg font-medium max-w-md mx-auto leading-relaxed">
+                            No plans are currently ongoing. Enjoy unlimited access to every powerful feature on Ravonixx without spending a dime.
+                        </p>
+                    </div>
+                </motion.div>
 
-                <div className="mt-20 text-center bg-gradient-to-br from-white/5 to-transparent border border-white/10 rounded-2xl p-8 md:p-12">
-                    <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Need a Custom Solution?</h2>
-                    <p className="text-gray-400 mb-8 max-w-2xl mx-auto">
-                        Running a large organization or tournament platform? Contact us for custom enterprise plans tailored to your needs.
-                    </p>
-                    <a
-                        href="https://discord.gg/ZT4KXFK3RD"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-8 py-3 bg-white hover:bg-gray-200 text-black font-bold rounded-xl transition-all"
-                    >
-                        <Shield size={20} />
-                        Contact Support
-                    </a>
-                </div>
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2, duration: 0.5 }}
+                    className="grid md:grid-cols-2 gap-8 text-left mt-16 max-w-3xl mx-auto"
+                >
+                    <div className="glass p-8 rounded-3xl border border-white/5 bg-gradient-to-b from-white/[0.03] to-transparent hover:border-white/10 transition-colors">
+                        <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-primary mb-6 ring-1 ring-white/10 shadow-lg">
+                            <Rocket size={24} />
+                        </div>
+                        <h3 className="text-2xl font-bold text-white mb-3 tracking-tight">Unlimited Limits</h3>
+                        <p className="text-gray-400 leading-relaxed font-medium">
+                            Create as many tournaments and scrims as you want. There are currently no restrictions on usage for any server large or small.
+                        </p>
+                    </div>
+                    
+                    <div className="glass p-8 rounded-3xl border border-white/5 bg-gradient-to-b from-white/[0.03] to-transparent hover:border-white/10 transition-colors">
+                        <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-primary mb-6 ring-1 ring-white/10 shadow-lg">
+                            <Shield size={24} />
+                        </div>
+                        <h3 className="text-2xl font-bold text-white mb-3 tracking-tight">Enterprise Grade</h3>
+                        <p className="text-gray-400 leading-relaxed font-medium">
+                            Get all the features normally reserved for enterprise clients, including advanced analytics and custom roles, completely free.
+                        </p>
+                    </div>
+                </motion.div>
+
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="mt-16"
+                >
+                    <Link href="/docs" className="inline-flex items-center justify-center px-10 py-4 text-lg font-bold text-black bg-white rounded-xl hover:bg-gray-200 hover:text-black transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_30px_rgba(255,255,255,0.4)]">
+                        Explore Features
+                    </Link>
+                </motion.div>
             </div>
         </div>
     );

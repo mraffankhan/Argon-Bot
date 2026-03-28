@@ -161,7 +161,7 @@ def random_thanks():
 
 
 tips = (
-    "We have an awesome support server:\nhttps://discord.gg/ZT4KXFK3RD",
+    "We have an awesome support server:\nhttps://discord.gg/XQkjvCfTv2",
     "You can set custom reactions for tourneys & scrims with Argon Pro.",
     "I like your face : )",  # I really do
     "You can add a role to multiple users with `role @role @user @user2...` command.",
@@ -172,7 +172,7 @@ tips = (
     "You can create tourney groups with `tourney` command.",
     "Scrims Open & Close messages can be designed with `sm` command.",
     "With Argon Pro you can set custom DM message.",
-    "We also make custom bots, checkout: https://discord.gg/ZT4KXFK3RD ",
+    "We also make custom bots, checkout: https://discord.gg/XQkjvCfTv2 ",
 )
 
 

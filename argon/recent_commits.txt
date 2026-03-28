@@ -1,0 +1,30 @@
+﻿ab974cf Login Error fixed
+bbcd68d fix: resolve prerender error and clean up unused files
+2172707 Update website folder
+8726a3d Fix Discord OAuth login issue
+5373ad4 Update links and RAVONIXX branding across the bot
+d495663 chore: update project documentation
+58fb91d docs: add contribution guidelines
+36c75a0 chore: update README with features
+8d893d9 refactor(web/auth): improve OAuth flow
+5fa1fee chore(web): update meta tags for SEO
+5acb6e2 refactor(web/nav): improve mobile animations
+98f2d4d feat(web): add keyboard navigation
+7610e96 fix(web): handle empty search results
+470b88b refactor(web): optimize search debouncing
+b42e0bf feat(web): add command count badges
+593e38e feat(web): add responsive breakpoints
+17e8025 refactor(reminder): optimize scheduling
+bd1a553 fix(ticket): handle channel deletion
+37d5c59 refactor(ticket): improve ticket creation UI
+21b4c3f fix(premium): handle expired subscriptions
+d46fd98 feat(premium): streamline activation flow
+4cc35a0 refactor(events): improve error reporting
+7d16b68 fix(events): handle guild unavailable events
+da84297 refactor(events): optimize listener registration
+07f41ce feat(events): add member join/leave logging
+d2f9e5b refactor(misc): streamline vote reminders
+e73363b fix(misc): handle API rate limits
+ba4a55f refactor(misc): improve credit formatting
+aa1928e feat(misc): add memory trending to info
+bad913c refactor(misc): optimize stats data collection

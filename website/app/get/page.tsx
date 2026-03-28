@@ -40,7 +40,7 @@ export default function GetPage() {
                             Need help? Join our official support server for assistance and updates.
                         </p>
                         <Link
-                            href="https://discord.gg/ZT4KXFK3RD"
+                            href="https://discord.gg/XQkjvCfTv2"
                             target="_blank"
                             className="inline-flex items-center gap-2 px-6 py-3 bg-[#5865F2] text-white font-bold rounded-xl hover:bg-[#4752C4] transition-colors"
                         >

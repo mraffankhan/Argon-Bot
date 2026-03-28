@@ -76,18 +76,18 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-6xl md:text-8xl lg:text-9xl font-black mb-8 tracking-tighter italic uppercase leading-[1.1] text-white"
+            className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-black mb-6 sm:mb-8 tracking-tighter italic uppercase leading-[1.1] text-white"
           >
-            RAVONIXX <span className="text-gradient">DEVELOPMENT</span>
+            RAVONIXX <span className="text-gradient">ECOSYSTEM</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-lg md:text-xl text-gray-400 mb-12 max-w-2xl font-medium leading-relaxed"
+            className="text-base sm:text-lg md:text-xl text-gray-400 mb-8 sm:mb-12 max-w-2xl font-medium leading-relaxed mx-auto px-2"
           >
-            The most powerful Discord platform for tournament management, scrims, and community scaling. Built for teams who demand elite performance.
+            The ultimate infrastructure for complete automation systems, real staff management, tournament operations, LAN event handling, and comprehensive community control.
           </motion.p>
 
           <motion.div
@@ -96,17 +96,17 @@ export default function Home() {
             transition={{ delay: 0.3 }}
             className="flex flex-col sm:flex-row gap-5"
           >
-            <button
-              onClick={() => window.location.href = '/api/auth/discord'}
-              className="px-10 py-5 bg-white text-black font-black text-lg rounded-2xl hover:bg-gray-100 transition-all flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95 group"
+            <Link
+              href="#features"
+              className="w-full sm:w-auto px-6 sm:px-10 py-4 sm:py-5 bg-white text-black font-black text-base sm:text-lg rounded-2xl hover:bg-gray-100 transition-all flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95 group"
             >
-              Start Building <ArrowRight className="group-hover:translate-x-1 transition-transform" />
-            </button>
+              Explore Services <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+            </Link>
             <Link
               href="/docs"
-              className="px-10 py-5 glass border border-white/10 text-white font-black text-lg rounded-2xl hover:bg-white/5 transition-all flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-6 sm:px-10 py-4 sm:py-5 glass border border-white/10 text-white font-black text-base sm:text-lg rounded-2xl hover:bg-white/5 transition-all flex items-center justify-center gap-2"
             >
-              <Terminal size={20} /> View Docs
+              <Terminal size={20} /> Developer Docs
             </Link>
           </motion.div>
         </div>
@@ -151,18 +151,18 @@ export default function Home() {
       {/* Stats Section */}
       <section className="py-24 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard 
               title="Total Users" 
               value={stats.error ? "Data unavailable" : stats.loading ? "Loading..." : stats.users.toLocaleString()} 
               prefix={!stats.loading && !stats.error ? "+" : ""} 
             />
             <StatCard 
-              title="Guilds Active" 
+              title="Communities Powered" 
               value={stats.error ? "Data unavailable" : stats.loading ? "Loading..." : stats.servers.toLocaleString()} 
             />
             <StatCard 
-              title="Global Commands" 
+              title="Automated Actions" 
               value={stats.error ? "Data unavailable" : stats.loading ? "Loading..." : stats.commands.toLocaleString()} 
             />
             <StatCard 
@@ -179,48 +179,53 @@ export default function Home() {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-20">
             <div>
               <h2 className="text-4xl md:text-6xl font-black text-white italic uppercase tracking-tighter mb-6">Engineered for<br /><span className="text-gradient">Performance</span></h2>
-              <p className="text-gray-400 text-lg max-w-xl">Every module in Argon is built from the ground up for speed, scalability, and ease of use in highly competitive environments.</p>
+              <p className="text-gray-400 text-lg max-w-xl">Every module in the Ravonixx Ecosystem is built from the ground up for speed, scalability, and ease of use in highly competitive environments.</p>
             </div>
-            <Link href="/tournaments" className="px-8 py-4 glass text-white font-bold rounded-2xl hover:bg-white/5 flex items-center gap-2 group border border-white/10 shrink-0">
-              Explore Platform <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+            <Link href="/docs" className="px-8 py-4 glass text-white font-bold rounded-2xl hover:bg-white/5 flex items-center gap-2 group border border-white/10 shrink-0">
+              Explore Documentation <ArrowRight className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             <FeatureItem
-              icon={<Trophy size={32} strokeWidth={1.5} />}
-              title="Tournament Engine"
-              description="A robust automation engine for single-elim, double-elim, and round-robin structures with auto-seeding."
-              color="primary"
-            />
-            <FeatureItem
-              icon={<Swords size={32} strokeWidth={1.5} />}
-              title="Scrim Management"
-              description="Daily scrim automation including point tables, slot management, and automated match reporting."
-              color="secondary"
-            />
-            <FeatureItem
               icon={<Zap size={32} strokeWidth={1.5} />}
-              title="Rapid Execution"
-              description="Built on an optimized database layer delivering sub-10ms query execution across millions of records."
-              color="blue-500"
+              title="Automation System"
+              description="A seamless automation engine taking the manual effort out of repetitive community and esports tasks."
+              color="primary"
+              href="/services/automation"
             />
             <FeatureItem
               icon={<Shield size={32} strokeWidth={1.5} />}
-              title="Enterprise Security"
-              description="ISO-grade encryption for user data and comprehensive audit logs for all administrative actions."
+              title="Real Staff Management"
+              description="Advanced tools to assign roles, track staff activity, and manage your team efficiently."
+              color="secondary"
+              href="/services/staff-management"
+            />
+            <FeatureItem
+              icon={<Trophy size={32} strokeWidth={1.5} />}
+              title="Tournament Operations"
+              description="Comprehensive operations for single-elimination, double-elimination, round-robin, and bracket automation."
+              color="blue-500"
+              href="/services/tournaments"
+            />
+            <FeatureItem
+              icon={<Box size={32} strokeWidth={1.5} />}
+              title="LAN Event Handling"
+              description="Dedicated modules for tracking on-site activities, dynamic scheduling, and live LAN updates."
               color="emerald-500"
+              href="/services/lan-events"
             />
             <FeatureItem
               icon={<Layers size={32} strokeWidth={1.5} />}
-              title="Discord Components v2"
-              description="Leveraging the latest Discord UI capabilities for interactive, high-fidelity community experiences."
+              title="Discord Setup & Control"
+              description="Full-scale Discord server architecture, automated onboarding, and comprehensive role control workflows."
               color="amber-500"
+              href="/services/discord"
             />
             <FeatureItem
               icon={<Globe size={32} strokeWidth={1.5} />}
-              title="Global Scale"
-              description="Deployed across edge locations worldwide to ensure low-latency access for gaming communities everywhere."
+              title="Global Scaling"
+              description="Deployed across global edge locations to ensure high-performance infrastructure for your operations."
               color="rose-500"
             />
           </div>
@@ -249,11 +254,11 @@ export default function Home() {
       <section className="py-40 relative overflow-hidden">
         <div className="absolute inset-0 bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
         <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-          <h2 className="text-4xl md:text-7xl font-black text-white italic uppercase tracking-tighter mb-8 italic leading-tight">Ready to <span className="text-gradient">Elevate</span> Your Community?</h2>
-          <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">Join thousands of servers already using Argon to automate their growth and competitive play.</p>
+          <h2 className="text-3xl sm:text-4xl md:text-7xl font-black text-white italic uppercase tracking-tighter mb-6 sm:mb-8 italic leading-tight">Ready to <span className="text-gradient">Elevate</span> Your Operations?</h2>
+          <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">Join thousands of organizations using Ravonixx to power their esports infrastructure and competitive play.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-             <Link href="/get" className="px-10 py-5 bg-white text-black font-black text-lg rounded-2xl hover:scale-105 transition-all">Add to Discord</Link>
-             <Link href="/community" className="px-10 py-5 glass border border-white/10 text-white font-black text-lg rounded-2xl hover:bg-white/5 transition-all">Join Community</Link>
+             <Link href="#features" className="w-full sm:w-auto px-6 py-4 sm:px-10 sm:py-5 bg-white text-black font-black text-base sm:text-lg rounded-2xl hover:scale-105 transition-all text-center">Explore Services</Link>
+             <Link href="mailto:support@ravonixx.xyz" className="w-full sm:w-auto px-6 py-4 sm:px-10 sm:py-5 glass border border-white/10 text-white font-black text-base sm:text-lg rounded-2xl hover:bg-white/5 transition-all text-center">Contact Sales</Link>
           </div>
         </div>
       </section>
@@ -267,9 +272,9 @@ function StatCard({ title, value, prefix }: { title: string; value: string; pref
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="glass border border-white/5 p-8 rounded-3xl"
+      className="glass border border-white/5 p-6 sm:p-8 rounded-3xl"
     >
-      <div className="text-3xl md:text-5xl font-black text-white mb-2 tracking-tighter italic">
+      <div className="text-2xl sm:text-3xl md:text-5xl font-black text-white mb-1 sm:mb-2 tracking-tighter italic">
         {prefix}{value}
       </div>
       <div className="text-xs font-bold uppercase tracking-widest text-gray-500">{title}</div>
@@ -277,17 +282,32 @@ function StatCard({ title, value, prefix }: { title: string; value: string; pref
   );
 }
 
-function FeatureItem({ icon, title, description, color }: { icon: React.ReactNode; title: string; description: string; color: string }) {
-  return (
-    <div className="group p-10 rounded-3xl glass border border-white/5 hover:border-primary/20 transition-all duration-500 relative overflow-hidden">
-      <div className={`mb-8 p-4 rounded-xl inline-flex text-white glass border border-white/10 group-hover:scale-110 group-hover:bg-primary/10 group-hover:border-primary/20 transition-all`}>
+function FeatureItem({ icon, title, description, color, href }: { icon: React.ReactNode; title: string; description: string; color: string; href?: string }) {
+  const content = (
+    <>
+      <div className={`mb-8 p-4 rounded-xl inline-flex text-white glass border border-white/10 group-hover:scale-110 group-hover:bg-white/5 transition-all`}>
         {icon}
       </div>
       <h3 className="text-2xl font-bold text-white mb-4 italic uppercase">{title}</h3>
-      <p className="text-gray-400 leading-relaxed font-medium">{description}</p>
+      <p className="text-gray-400 leading-relaxed font-medium mb-6">{description}</p>
+      {href && (
+        <div className="flex items-center text-sm font-bold text-white uppercase tracking-wider group-hover:underline">
+          Learn More <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
+        </div>
+      )}
       
       {/* Subtle Background Accent */}
-      <div className="absolute -bottom-10 -right-10 w-24 h-24 bg-primary/5 blur-2xl rounded-full group-hover:bg-primary/10 transition-colors" />
+      <div className="absolute -bottom-10 -right-10 w-24 h-24 bg-primary/5 blur-2xl rounded-full group-hover:bg-white/10 transition-colors" />
+    </>
+  );
+
+  return href ? (
+    <Link href={href} className="flex flex-col group p-10 rounded-3xl glass border border-white/5 hover:border-white/20 transition-all duration-500 relative overflow-hidden h-full">
+      {content}
+    </Link>
+  ) : (
+    <div className="group p-10 rounded-3xl glass border border-white/5 hover:border-white/20 transition-all duration-500 relative overflow-hidden">
+      {content}
     </div>
   );
 }

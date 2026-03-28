@@ -44,3 +44,5 @@ line-length = 122
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.pyright]
+extraPaths = ["src"]

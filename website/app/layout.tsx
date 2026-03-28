@@ -7,13 +7,13 @@ import Footer from "@/components/Footer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "RAVONIXX | The Ultimate Esports Tournament Management Platform",
-  description: "Automate your esports tournaments, scrims, and community management with Ravonixx. The most powerful Discord-integrated platform for competitive gaming.",
-  keywords: ["esports management", "tournament automation", "discord bot", "argon bot", "scrims manager", "gaming community", "esports platform"],
+  title: "RAVONIXX | The Ultimate Esports Ecosystem",
+  description: "Powering the entire esports ecosystem with automation, staff management, LAN applications, and complete community control.",
+  keywords: ["esports ecosystem", "tournament automation", "discord bot", "argon bot", "scrims manager", "gaming community", "esports platform"],
   authors: [{ name: "Ravonixx Team", url: "https://ravonixx.xyz" }],
   openGraph: {
-    title: "RAVONIXX | Elite Esports Management",
-    description: "Scale your gaming community with automated tournaments and powerful Discord integration.",
+    title: "RAVONIXX | Complete Esports Ecosystem",
+    description: "Scale your gaming community with comprehensive esports infrastructure and automation.",
     url: "https://ravonixx.xyz",
     siteName: "Ravonixx",
     images: [
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Argon Esports Platform",
+        alt: "Ravonixx Esports Platform",
       },
     ],
     locale: "en_US",
@@ -29,8 +29,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "ARGON | Elite Esports Management",
-    description: "The next generation of Discord-driven esports automation.",
+    title: "RAVONIXX | Complete Esports Ecosystem",
+    description: "The next generation of complete esports infrastructure and automation.",
     images: ["/og-image.png"],
     creator: "@argonbot",
   },

@@ -848,7 +848,7 @@ export default function ServerManagePage({ params }: { params: Promise<{ id: str
 
                                     {!userPremium?.is_premium && (
                                         <a
-                                            href="https://discord.gg/ZT4KXFK3RD"
+                                            href="https://discord.gg/XQkjvCfTv2"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] transition-all transform hover:scale-105"
@@ -900,7 +900,7 @@ export default function ServerManagePage({ params }: { params: Promise<{ id: str
 
                                     {!guildPremium?.is_premium && (
                                         <a
-                                            href="https://discord.gg/ZT4KXFK3RD"
+                                            href="https://discord.gg/XQkjvCfTv2"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="px-8 py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-xl shadow-[0_0_20px_rgba(234,179,8,0.3)] hover:shadow-[0_0_30px_rgba(234,179,8,0.5)] transition-all transform hover:scale-105"
@@ -940,7 +940,7 @@ export default function ServerManagePage({ params }: { params: Promise<{ id: str
                                                 </div>
 
                                                 <a
-                                                    href="https://discord.gg/ZT4KXFK3RD"
+                                                    href="https://discord.gg/XQkjvCfTv2"
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="relative z-10 w-full block text-center py-2.5 rounded-lg font-bold transition-all bg-white/10 hover:bg-yellow-500 hover:text-black text-white"
