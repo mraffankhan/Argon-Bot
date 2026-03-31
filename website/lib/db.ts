@@ -1,12 +1,23 @@
 import postgres from 'postgres';
 
-const sql = postgres({
-    host: process.env.DB_HOST || 'db.fwywdcoiudevrssihfuf.supabase.co',
-    port: Number(process.env.DB_PORT) || 5432,
-    database: process.env.DB_NAME || 'postgres',
-    username: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD || 'affan@805032',
-    ssl: { rejectUnauthorized: false }
-});
+let _db: ReturnType<typeof postgres> | null = null;
 
-export const db = sql;
+export function getDb() {
+    if (!_db) {
+        const dbUrl = (process.env.DATABASE_URL || "").replace("?schema=public", "");
+        _db = postgres(dbUrl, {
+            ssl: { rejectUnauthorized: false }
+        });
+    }
+    return _db;
+}
+
+export const db = new Proxy({} as ReturnType<typeof postgres>, {
+    get(_target, prop) {
+        const sql = getDb();
+        return (sql as any)[prop];
+    },
+    apply(_target, _thisArg, args) {
+        return getDb()(...args);
+    }
+});

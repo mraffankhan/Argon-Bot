@@ -35,18 +35,22 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
+  id            String    @id @default(uuid())
+  discordId     String    @unique
+  username      String
   email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  discordId     String?   @unique
+  avatar        String?
+  profileSlug   String?   @unique
+  role          String    @default("USER") // DEVELOPER, ORGANIZER, STAFF, USER
   createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   
   accounts      Account[]
   sessions      Session[]
   teamMembers   TeamMember[]
-  stats         PlayerStat[]
+  playerStats   PlayerStat[]
+  captainOf     Team[]       @relation("CaptainTeams")
+  badges        Badge[]
 }
 
 model VerificationToken {
@@ -64,10 +68,12 @@ model Team {
   tournamentId String
   createdAt    DateTime @default(now())
 
-  tournament   Tournament   @relation(fields: [tournamentId], references: [id])
+  captain      User               @relation("CaptainTeams", fields: [captainId], references: [id])
+  tournament   Tournament         @relation(fields: [tournamentId], references: [id])
   members      TeamMember[]
-  matchesAsT1  Match[]      @relation("Team1Matches")
-  matchesAsT2  Match[]      @relation("Team2Matches")
+  matchEntries MatchEntry[]
+  standings    TournamentStanding[]
+  groups       Group[]            // Teams assigned to specific groups in different stages
 }
 
 model TeamMember {
@@ -81,72 +87,147 @@ model TeamMember {
 }
 
 model Tournament {
-  id          String   @id @default(uuid())
-  name        String
-  game        String
-  format      String
-  organizerId String
-  guildId     String
-  status      String   @default("OPEN")
-  maxTeams    Int
-  prize       String?
-  rules       String?
-  createdAt   DateTime @default(now())
+  id            String   @id @default(uuid())
+  name          String
+  game          String
+  format        String
+  organizerId   String
+  guildId       String
+  teamSize      Int      @default(4)
+  status        String   @default("OPEN")
+  
+  // Registration and Groups config
+  maxTeams      Int      // Corresponds to 'Total number of slots'
+  teamsPerGroup Int      @default(12)
+  pingRoleId    String?  // Discord Role ID to ping for announcements
 
-  teams       Team[]
-  matches     Match[]
-  stats       PlayerStat[]
+  // Discord Automation IDs
+  categoryId             String?
+  announcementsChannelId String?
+  howToRegisterChannelId String?
+
+  prize         String?
+  rules         String?
+  bannerUrl     String?
+  discordInvite String?
+  isPublic      Boolean  @default(true)
+  isFeatured    Boolean  @default(false)
+  featuredUntil DateTime?
+  featuredTier  String?
+  totalMatches  Int      @default(6)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  teams         Team[]
+  matches       Match[]
+  standings     TournamentStanding[]
+  stats         PlayerStat[]
+  stages        Stage[]  // Stages like Qualifiers, Quarter Finals, etc.
+}
+
+model Stage {
+  id           String     @id @default(cuid())
+  tournamentId String
+  name         String     // e.g., "Quarter Finals", "Semi Finals", "Grand Finals"
+  order        Int        // 1, 2, 3...
+  status       String     @default("PENDING") // PENDING, ACTIVE, COMPLETED
+  createdAt    DateTime   @default(now())
+
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  groups       Group[]
+}
+
+model Group {
+  id           String   @id @default(cuid())
+  stageId      String
+  name         String   // e.g., "Group-01"
+  roleId       String?  // Discord Role assigned to this group
+  channelId    String?  // Discord Channel for this group
+  createdAt    DateTime @default(now())
+
+  stage        Stage    @relation(fields: [stageId], references: [id])
+  teams        Team[]   // Teams assigned to this group via implicit many-to-many
+  matches      Match[]  // Matches played within this group
 }
 
 model Match {
-  id           String   @id @default(uuid())
-  tournamentId String
-  round        Int
-  team1Id      String?
-  team2Id      String?
-  status       String   @default("SCHEDULED")
-  scheduledAt  DateTime?
+  id             String   @id @default(cuid())
+  tournamentId   String
+  groupId        String?  // Optional for backward compatibility, but generally highly tied to a Group now
+  matchNumber    Int
+  lobbyName      String?
+  status         String   @default("SCHEDULED")
+  killMultiplier Int      @default(1)
+  scheduledAt    DateTime?
+  completedAt    DateTime?
+  reminderSent   Boolean  @default(false)
 
-  tournament   Tournament @relation(fields: [tournamentId], references: [id])
-  team1        Team?      @relation("Team1Matches", fields: [team1Id], references: [id])
-  team2        Team?      @relation("Team2Matches", fields: [team2Id], references: [id])
-  scores       Score[]
-  disputes     Dispute[]
+  tournament     Tournament   @relation(fields: [tournamentId], references: [id])
+  group          Group?       @relation(fields: [groupId], references: [id])
+  entries        MatchEntry[]
 }
 
-model Score {
-  id            String   @id @default(uuid())
-  matchId       String
-  submittedBy   String
-  team1Score    Int
-  team2Score    Int
-  screenshotUrl String?
-  confirmed     Boolean  @default(false)
-  createdAt     DateTime @default(now())
-
-  match         Match    @relation(fields: [matchId], references: [id])
-}
-
-model Dispute {
-  id             String   @id @default(uuid())
+model MatchEntry {
+  id             String   @id @default(cuid())
   matchId        String
-  status         String   @default("OPEN")
-  resolvedBy     String?
-  resolutionNote String?
+  teamId         String
+  placement      Int?
+  kills          Int?     @default(0)
+  placementPts   Int?
+  killPts        Int?
+  totalPts       Int?
+  screenshotUrl  String?
+  submittedBy    String?
+  verifiedBy     String?
+  status         String   @default("PENDING")
   createdAt      DateTime @default(now())
 
   match          Match    @relation(fields: [matchId], references: [id])
+  team           Team     @relation(fields: [teamId], references: [id])
+}
+
+model TournamentStanding {
+  id           String     @id @default(cuid())
+  tournamentId String
+  teamId       String
+  totalPoints  Int        @default(0)
+  totalKills   Int        @default(0)
+  totalMatches Int        @default(0)
+  bestMatch    Int        @default(0)
+  rank         Int?
+
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  team         Team       @relation(fields: [teamId], references: [id])
+
+  @@unique([tournamentId, teamId])
 }
 
 model PlayerStat {
-  userId       String
-  tournamentId String
-  wins         Int      @default(0)
-  losses       Int      @default(0)
-  mvpCount     Int      @default(0)
+  userId         String
+  tournamentId   String
+  wins           Int      @default(0)
+  losses         Int      @default(0)
+  mvpCount       Int      @default(0)
+  totalKills     Int      @default(0)
+  booyahCount    Int      @default(0)
+  avgPlacement   Float    @default(0)
+  bestPlacement  Int?
 
-  user         User       @relation(fields: [userId], references: [id])
-  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  user           User       @relation(fields: [userId], references: [id])
+  tournament     Tournament @relation(fields: [tournamentId], references: [id])
 
   @@id([userId, tournamentId])
+}
+
+model Badge {
+  id        String   @id @default(cuid())
+  userId    String
+  slug      String
+  name      String
+  emoji     String
+  awardedAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, slug])
 }

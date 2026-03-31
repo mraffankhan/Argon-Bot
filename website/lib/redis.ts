@@ -9,12 +9,13 @@ const getRedisUrl = () => {
 
 export const redis = new Redis(getRedisUrl(), {
     lazyConnect: true,
+    maxRetriesPerRequest: 0,
     retryStrategy(times) {
-        const delay = Math.min(times * 50, 2000);
-        return delay;
+        if (times > 3) return null;
+        return Math.min(times * 50, 2000);
     },
 });
 
 redis.on('error', (err) => {
-    console.warn('Redis connection error:', err);
+    // Suppress infinite ECONNREFUSED spam 
 });

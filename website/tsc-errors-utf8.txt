@@ -1,0 +1,16 @@
+﻿app/api/players/[discordId]/route.ts(33,13): error TS2353: Object literal may only specify known properties, and 'team1Id' does not exist in type 'MatchWhereInput'.
+app/api/players/[discordId]/route.ts(34,13): error TS2353: Object literal may only specify known properties, and 'team2Id' does not exist in type 'MatchWhereInput'.
+app/api/players/[discordId]/route.ts(41,9): error TS2353: Object literal may only specify known properties, and 'team1' does not exist in type 'MatchInclude<DefaultArgs>'.
+app/api/players/[discordId]/route.ts(77,13): error TS2339: Property 'scores' does not exist on type '{ status: string; id: string; groupId: string | null; matchNumber: number; lobbyName: string | null; killMultiplier: number; scheduledAt: Date | null; completedAt: Date | null; reminderSent: boolean; tournamentId: string; }'.
+app/api/players/[discordId]/route.ts(78,26): error TS2339: Property 'scores' does not exist on type '{ status: string; id: string; groupId: string | null; matchNumber: number; lobbyName: string | null; killMultiplier: number; scheduledAt: Date | null; completedAt: Date | null; reminderSent: boolean; tournamentId: string; }'.
+app/api/players/[discordId]/route.ts(81,52): error TS2339: Property 'team1Id' does not exist on type '{ status: string; id: string; groupId: string | null; matchNumber: number; lobbyName: string | null; killMultiplier: number; scheduledAt: Date | null; completedAt: Date | null; reminderSent: boolean; tournamentId: string; }'.
+app/api/players/[discordId]/route.ts(84,24): error TS2339: Property 'team2' does not exist on type '{ status: string; id: string; groupId: string | null; matchNumber: number; lobbyName: string | null; killMultiplier: number; scheduledAt: Date | null; completedAt: Date | null; reminderSent: boolean; tournamentId: string; }'.
+app/api/players/[discordId]/route.ts(88,24): error TS2339: Property 'team1' does not exist on type '{ status: string; id: string; groupId: string | null; matchNumber: number; lobbyName: string | null; killMultiplier: number; scheduledAt: Date | null; completedAt: Date | null; reminderSent: boolean; tournamentId: string; }'.
+app/dashboard/tournaments/[id]/points/page.tsx(14,25): error TS2339: Property 'id' does not exist on type 'Promise<{ id: string; }>'.
+app/profile/page.tsx(52,24): error TS18047: 'dbUser' is possibly 'null'.
+app/profile/page.tsx(60,37): error TS18047: 'dbUser' is possibly 'null'.
+app/profile/page.tsx(61,5): error TS18047: 'dbUser' is possibly 'null'.
+app/profile/page.tsx(86,38): error TS18047: 'dbUser' is possibly 'null'.
+app/profile/page.tsx(90,34): error TS18047: 'dbUser' is possibly 'null'.
+app/profile/page.tsx(96,34): error TS18047: 'dbUser' is possibly 'null'.
+app/profile/page.tsx(100,95): error TS18047: 'dbUser' is possibly 'null'.

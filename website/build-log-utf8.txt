@@ -1,0 +1,48 @@
+﻿
+> website@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local, .env
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 5.2s
+  Running TypeScript ...
+node.exe : Failed to compile.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" 
+"C:\Users\khana\AppData\Roaming\ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecifi 
+   ed: (Failed to compile.:String) [],   
+  RemoteException
+    + FullyQualifiedErrorId : NativeComm 
+   andError
+ 
+
+./app/api/players/[discordId]/route.ts:33
+:13
+Type error: Object literal may only 
+specify known properties, and 'team1Id' 
+does not exist in type 'MatchWhereInput'.
+
+[0m [90m 31 |[39m       
+where[33m:[39m {
+ [90m 32 |[39m         
+[33mOR[39m[33m:[39m [
+[31m[1m>[22m[39m[90m 33 |[39m      
+     { team1Id[33m:[39m { 
+[36min[39m[33m:[39m teamIds } 
+}[33m,[39m
+ [90m    |[39m             
+[31m[1m^[22m[39m
+ [90m 34 |[39m           { 
+team2Id[33m:[39m { 
+[36min[39m[33m:[39m teamIds } }
+ [90m 35 |[39m         ][33m,[39m
+ [90m 36 |[39m         
+status[33m:[39m 
+[32m"COMPLETED"[39m[0m
+Next.js build worker exited with code: 1 
+and signal: null

@@ -2,312 +2,94 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { 
-  ArrowRight, Trophy, Swords, Ticket, Database, 
-  UserPlus, Crown, Shield, Server, Box, Terminal,
-  Zap, Globe, Layout, Share2, Layers
-} from "lucide-react";
+import { ArrowRight, Gamepad2, Users, Target, Trophy, Swords, Medal, Star } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Home() {
-  const [stats, setStats] = useState<{
-    commands: number | string;
-    users: number | string;
-    servers: number | string;
-    uptime: string;
-    loading: boolean;
-    error: boolean;
-  }>({
-    commands: 0,
-    users: 0,
-    servers: 0,
-    uptime: "99.9%",
-    loading: true,
-    error: false
-  });
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    fetch('/api/stats')
-      .then(res => res.json())
-      .then(data => {
-        if (!data.error) {
-          setStats({
-            commands: data.commands,
-            users: data.users,
-            servers: data.servers,
-            uptime: data.uptime,
-            loading: false,
-            error: false
-          });
-        } else {
-          setStats(prev => ({ ...prev, loading: false, error: true }));
-        }
-      })
-      .catch(err => {
-        console.error("Failed to fetch stats", err);
-        setStats(prev => ({ ...prev, loading: false, error: true }));
-      });
+    setMounted(true);
   }, []);
 
+  if (!mounted) return null;
+
   return (
-    <div className="flex flex-col min-h-screen bg-black">
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center pt-20 overflow-hidden">
-        {/* Animated Background Gradients */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-          <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/20 blur-[150px] animate-pulse" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-secondary/10 blur-[150px] animate-pulse delay-700" />
-        </div>
+    <div className="min-h-screen">
+      <section className="relative min-h-[80vh] flex flex-col items-center justify-center px-6 overflow-hidden" aria-label="Hero">
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 blur-[150px] rounded-full pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto px-6 relative z-10 flex flex-col items-center text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-2 px-4 py-1.5 rounded-full glass border border-white/5 text-sm font-semibold text-gray-400 mb-8"
-          >
-            <span className="flex h-2 w-2 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-            </span>
-            <span>Platform is Live & Scaleable</span>
-          </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center relative z-10"
+        >
+          <h1 className="text-7xl sm:text-8xl md:text-[10rem] font-black text-white italic tracking-tighter leading-[0.85] mb-6">
+            RAVONIXX
+          </h1>
+          <p className="text-gray-500 text-lg font-medium mb-8">The Ultimate Esports Tournament Platform</p>
 
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-black mb-6 sm:mb-8 tracking-tighter italic uppercase leading-[1.1] text-white"
-          >
-            RAVONIXX <span className="text-gradient">ECOSYSTEM</span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-base sm:text-lg md:text-xl text-gray-400 mb-8 sm:mb-12 max-w-2xl font-medium leading-relaxed mx-auto px-2"
-          >
-            The ultimate infrastructure for complete automation systems, real staff management, tournament operations, LAN event handling, and comprehensive community control.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="flex flex-col sm:flex-row gap-5"
-          >
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
             <Link
-              href="#features"
-              className="w-full sm:w-auto px-6 sm:px-10 py-4 sm:py-5 bg-white text-black font-black text-base sm:text-lg rounded-2xl hover:bg-gray-100 transition-all flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95 group"
+              href="/tournaments"
+              className="inline-flex items-center gap-2.5 px-8 py-4 bg-white text-black font-bold text-lg rounded-2xl hover:bg-gray-100 transition-all hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.1)]"
             >
-              Explore Services <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+              <Gamepad2 className="w-5 h-5" />
+              Play Now
+              <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
-              href="/docs"
-              className="w-full sm:w-auto px-6 sm:px-10 py-4 sm:py-5 glass border border-white/10 text-white font-black text-base sm:text-lg rounded-2xl hover:bg-white/5 transition-all flex items-center justify-center gap-2"
+              href="/teams"
+              className="inline-flex items-center gap-2.5 px-8 py-4 glass border border-white/10 text-white font-bold text-lg rounded-2xl hover:bg-white/5 transition-all hover:scale-105 active:scale-95"
             >
-              <Terminal size={20} /> Developer Docs
+              <Users className="w-5 h-5" />
+              Find Team
             </Link>
-          </motion.div>
-        </div>
-
-        {/* Floating Component Mockups */}
-        <div className="relative w-full max-w-6xl mx-auto mt-24 px-6 hidden lg:block">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 0.5 }}
-            className="w-full aspect-video glass rounded-3xl border border-white/10 overflow-hidden shadow-2xl relative"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
-            <div className="p-8 h-full flex flex-col">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-white/10" />
-                  <div className="w-3 h-3 rounded-full bg-white/10" />
-                  <div className="w-3 h-3 rounded-full bg-white/10" />
-                </div>
-                <div className="h-6 w-48 rounded-md bg-white/5 border border-white/5" />
-              </div>
-              <div className="flex-grow grid grid-cols-12 gap-6">
-                <div className="col-span-3 space-y-4">
-                  {[1,2,3,4].map(i => <div key={i} className="h-4 w-full rounded bg-white/5" />)}
-                </div>
-                <div className="col-span-9 space-y-6">
-                  <div className="h-32 w-full rounded-2xl bg-white/5 border border-white/5" />
-                  <div className="grid grid-cols-2 gap-6">
-                    <div className="h-40 w-full rounded-2xl bg-white/5 border border-white/5" />
-                    <div className="h-40 w-full rounded-2xl bg-white/5 border border-white/5" />
-                  </div>
-                </div>
-              </div>
-            </div>
-            {/* Real Image Layer if available */}
-            {/* <img src="/dashboard-preview.png" className="absolute inset-0 object-cover opacity-50" /> */}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-24 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCard 
-              title="Total Users" 
-              value={stats.error ? "Data unavailable" : stats.loading ? "Loading..." : stats.users.toLocaleString()} 
-              prefix={!stats.loading && !stats.error ? "+" : ""} 
-            />
-            <StatCard 
-              title="Communities Powered" 
-              value={stats.error ? "Data unavailable" : stats.loading ? "Loading..." : stats.servers.toLocaleString()} 
-            />
-            <StatCard 
-              title="Automated Actions" 
-              value={stats.error ? "Data unavailable" : stats.loading ? "Loading..." : stats.commands.toLocaleString()} 
-            />
-            <StatCard 
-              title="System Uptime" 
-              value={stats.uptime} 
-            />
           </div>
-        </div>
+
+          <div className="flex items-center justify-center gap-3">
+            <span className="text-gray-600 text-sm font-medium">POWERED BY</span>
+            <span className="text-white text-xl font-black uppercase tracking-wider">VoxiHost</span>
+          </div>
+        </motion.div>
       </section>
 
-      {/* Features Grid */}
-      <section id="features" className="py-32 relative">
+      <section className="py-20 border-t border-white/5" aria-label="Platform Statistics">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-20">
-            <div>
-              <h2 className="text-4xl md:text-6xl font-black text-white italic uppercase tracking-tighter mb-6">Engineered for<br /><span className="text-gradient">Performance</span></h2>
-              <p className="text-gray-400 text-lg max-w-xl">Every module in the Ravonixx Ecosystem is built from the ground up for speed, scalability, and ease of use in highly competitive environments.</p>
-            </div>
-            <Link href="/docs" className="px-8 py-4 glass text-white font-bold rounded-2xl hover:bg-white/5 flex items-center gap-2 group border border-white/10 shrink-0">
-              Explore Documentation <ArrowRight className="group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <FeatureItem
-              icon={<Zap size={32} strokeWidth={1.5} />}
-              title="Automation System"
-              description="A seamless automation engine taking the manual effort out of repetitive community and esports tasks."
-              color="primary"
-              href="/services/automation"
-            />
-            <FeatureItem
-              icon={<Shield size={32} strokeWidth={1.5} />}
-              title="Real Staff Management"
-              description="Advanced tools to assign roles, track staff activity, and manage your team efficiently."
-              color="secondary"
-              href="/services/staff-management"
-            />
-            <FeatureItem
-              icon={<Trophy size={32} strokeWidth={1.5} />}
-              title="Tournament Operations"
-              description="Comprehensive operations for single-elimination, double-elimination, round-robin, and bracket automation."
-              color="blue-500"
-              href="/services/tournaments"
-            />
-            <FeatureItem
-              icon={<Box size={32} strokeWidth={1.5} />}
-              title="LAN Event Handling"
-              description="Dedicated modules for tracking on-site activities, dynamic scheduling, and live LAN updates."
-              color="emerald-500"
-              href="/services/lan-events"
-            />
-            <FeatureItem
-              icon={<Layers size={32} strokeWidth={1.5} />}
-              title="Discord Setup & Control"
-              description="Full-scale Discord server architecture, automated onboarding, and comprehensive role control workflows."
-              color="amber-500"
-              href="/services/discord"
-            />
-            <FeatureItem
-              icon={<Globe size={32} strokeWidth={1.5} />}
-              title="Global Scaling"
-              description="Deployed across global edge locations to ensure high-performance infrastructure for your operations."
-              color="rose-500"
-            />
+          <h2 className="sr-only">Platform Statistics</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <StatCard icon={<Target className="w-5 h-5 text-primary" />} label="Total Kills" value="1.2M" />
+            <StatCard icon={<Trophy className="w-5 h-5 text-yellow-500" />} label="Tournaments Hosted" value="2,341" />
+            <StatCard icon={<Swords className="w-5 h-5 text-secondary" />} label="Active Players" value="12.8K" />
+            <StatCard icon={<Medal className="w-5 h-5 text-emerald-500" />} label="Platform Uptime" value="99.9%" />
           </div>
         </div>
       </section>
 
-      {/* Social / Trust Section */}
-      <section className="py-24 border-y border-white/5 bg-white/[0.01]">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-12">
-            <div>
-              <h3 className="text-2xl font-bold text-white mb-2">Trusted by the best.</h3>
-              <p className="text-gray-500">Powering events and organizations around the globe.</p>
-            </div>
-            <div className="flex flex-wrap items-center gap-12 opacity-30 grayscale brightness-200">
-               {/* Placeholders for partner logos */}
-               <Box size={40} />
-               <Layout size={40} />
-               <Share2 size={40} />
-               <Zap size={40} />
-               <Globe size={40} />
-            </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-40 relative overflow-hidden">
-        <div className="absolute inset-0 bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
-        <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-          <h2 className="text-3xl sm:text-4xl md:text-7xl font-black text-white italic uppercase tracking-tighter mb-6 sm:mb-8 italic leading-tight">Ready to <span className="text-gradient">Elevate</span> Your Operations?</h2>
-          <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">Join thousands of organizations using Ravonixx to power their esports infrastructure and competitive play.</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-             <Link href="#features" className="w-full sm:w-auto px-6 py-4 sm:px-10 sm:py-5 bg-white text-black font-black text-base sm:text-lg rounded-2xl hover:scale-105 transition-all text-center">Explore Services</Link>
-             <Link href="mailto:support@ravonixx.xyz" className="w-full sm:w-auto px-6 py-4 sm:px-10 sm:py-5 glass border border-white/10 text-white font-black text-base sm:text-lg rounded-2xl hover:bg-white/5 transition-all text-center">Contact Sales</Link>
-          </div>
+      <section className="py-20 border-t border-white/5" aria-label="Trusted Partners">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <Star className="w-8 h-8 text-yellow-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-white mb-2">Trusted by the best</h2>
+          <p className="text-gray-500 mb-8">Powering esports organizations and communities worldwide</p>
+          <Link 
+            href="/sponsors"
+            className="inline-flex items-center gap-2 px-6 py-3 glass border border-white/10 text-white font-medium rounded-xl hover:bg-white/5 transition-all"
+          >
+            View Our Partners <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
       </section>
     </div>
   );
 }
 
-function StatCard({ title, value, prefix }: { title: string; value: string; prefix?: string }) {
+function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      className="glass border border-white/5 p-6 sm:p-8 rounded-3xl"
-    >
-      <div className="text-2xl sm:text-3xl md:text-5xl font-black text-white mb-1 sm:mb-2 tracking-tighter italic">
-        {prefix}{value}
-      </div>
-      <div className="text-xs font-bold uppercase tracking-widest text-gray-500">{title}</div>
-    </motion.div>
-  );
-}
-
-function FeatureItem({ icon, title, description, color, href }: { icon: React.ReactNode; title: string; description: string; color: string; href?: string }) {
-  const content = (
-    <>
-      <div className={`mb-8 p-4 rounded-xl inline-flex text-white glass border border-white/10 group-hover:scale-110 group-hover:bg-white/5 transition-all`}>
-        {icon}
-      </div>
-      <h3 className="text-2xl font-bold text-white mb-4 italic uppercase">{title}</h3>
-      <p className="text-gray-400 leading-relaxed font-medium mb-6">{description}</p>
-      {href && (
-        <div className="flex items-center text-sm font-bold text-white uppercase tracking-wider group-hover:underline">
-          Learn More <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
-        </div>
-      )}
-      
-      {/* Subtle Background Accent */}
-      <div className="absolute -bottom-10 -right-10 w-24 h-24 bg-primary/5 blur-2xl rounded-full group-hover:bg-white/10 transition-colors" />
-    </>
-  );
-
-  return href ? (
-    <Link href={href} className="flex flex-col group p-10 rounded-3xl glass border border-white/5 hover:border-white/20 transition-all duration-500 relative overflow-hidden h-full">
-      {content}
-    </Link>
-  ) : (
-    <div className="group p-10 rounded-3xl glass border border-white/5 hover:border-white/20 transition-all duration-500 relative overflow-hidden">
-      {content}
+    <div className="glass border border-white/5 rounded-2xl p-6 text-center hover:border-white/10 transition-all">
+      <div className="flex items-center justify-center mb-3" aria-hidden="true">{icon}</div>
+      <div className="text-2xl md:text-3xl font-black text-white tracking-tight italic mb-1">{value}</div>
+      <div className="text-xs text-gray-600 font-semibold uppercase tracking-wider">{label}</div>
     </div>
   );
 }
